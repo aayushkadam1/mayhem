@@ -11,12 +11,18 @@ export function getSocket(): Socket {
     socket = io(SERVER_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionDelay: 1000,
+      reconnectionDelay: 500,
+      reconnectionDelayMax: 5000,
       reconnectionAttempts: Infinity,
+      timeout: 10000,
     });
   }
   return socket;
 }
+
+// Eagerly connect at module load so the socket is ready
+// before any component mounts.
+getSocket();
 
 export async function api<T = unknown>(
   path: string,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import { getSocket } from '../socket';
+import { getSocket, api } from '../socket';
 import type { PublicState } from '../types';
 
 export function useGameState(): PublicState | null {
@@ -17,8 +17,23 @@ export function useGameState(): PublicState | null {
 
     socket.on('state:update', handler);
 
+    // Fetch initial state via REST immediately so we don't
+    // depend on the socket connection being established first.
+    api<PublicState>('/api/state')
+      .then(handler)
+      .catch(() => {});
+
+    // Re-fetch whenever the socket reconnects so we never get stale.
+    const onConnect = () => {
+      api<PublicState>('/api/state')
+        .then(handler)
+        .catch(() => {});
+    };
+    socket.on('connect', onConnect);
+
     return () => {
       socket.off('state:update', handler);
+      socket.off('connect', onConnect);
     };
   }, []);
 
@@ -32,7 +47,11 @@ export function useTimer(endTime: number | null, running: boolean) {
   });
 
   useEffect(() => {
-    if (!running || !endTime) return;
+    if (!running || !endTime) {
+      setRemaining(0);
+      return;
+    }
+    setRemaining(Math.max(0, endTime - Date.now()));
     const interval = setInterval(() => {
       setRemaining(Math.max(0, endTime - Date.now()));
     }, 100);

@@ -1,0 +1,594 @@
+{
+  "currentRound": 2,
+  "warRound": 4,
+  "teams": [
+    {
+      "id": "fb1",
+      "name": "Team FB-1",
+      "password": "Kx7mP2",
+      "domain": "Food & Beverages",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 1
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "fb2",
+      "name": "Team FB-2",
+      "password": "Qr9fN3",
+      "domain": "Food & Beverages",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 19
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 5
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "fb3",
+      "name": "Team FB-3",
+      "password": "Wz5gT8",
+      "domain": "Food & Beverages",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 1
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "fb4",
+      "name": "Team FB-4",
+      "password": "Hb6jY4",
+      "domain": "Food & Beverages",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "ca1",
+      "name": "Team CA-1",
+      "password": "Lp3nV7",
+      "domain": "Clothing & Apparels",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "ca2",
+      "name": "Team CA-2",
+      "password": "Sd8kM1",
+      "domain": "Clothing & Apparels",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 6
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "ca3",
+      "name": "Team CA-3",
+      "password": "Vf2rX9",
+      "domain": "Clothing & Apparels",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "ca4",
+      "name": "Team CA-4",
+      "password": "Tc6yW5",
+      "domain": "Clothing & Apparels",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "me1",
+      "name": "Team ME-1",
+      "password": "Jn4bQ8",
+      "domain": "Media & Entertainment",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "me2",
+      "name": "Team ME-2",
+      "password": "Xg7dH3",
+      "domain": "Media & Entertainment",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "me3",
+      "name": "Team ME-3",
+      "password": "Mw9zS6",
+      "domain": "Media & Entertainment",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    },
+    {
+      "id": "me4",
+      "name": "Team ME-4",
+      "password": "Fr1cK4",
+      "domain": "Media & Entertainment",
+      "eliminated": false,
+      "scores": {
+        "round1": {
+          "insightAccuracy": 0,
+          "taglineCreativity": 0,
+          "audienceInsight": 0,
+          "bonusTokens": 0,
+          "judgeVotes": 0
+        },
+        "round2": {
+          "remainingTokens": 0,
+          "judgeVotes": 0
+        },
+        "round3": {
+          "creativity": 0,
+          "relevance": 0,
+          "performance": 0,
+          "clarity": 0,
+          "engagement": 0,
+          "judgeVotes": 0
+        },
+        "round4": {
+          "strategy": 0,
+          "creativity": 0,
+          "impact": 0,
+          "audienceVotes": 0
+        },
+        "round5": {
+          "insight": 0,
+          "strategy": 0,
+          "creativity": 0,
+          "feasibility": 0,
+          "delivery": 0,
+          "judgeVotes": 0
+        }
+      }
+    }
+  ],
+  "primes": [
+    {
+      "id": "p1",
+      "name": "Prime Member 1",
+      "password": "Prime@01"
+    },
+    {
+      "id": "p2",
+      "name": "Prime Member 2",
+      "password": "Prime@02"
+    },
+    {
+      "id": "p3",
+      "name": "Prime Member 3",
+      "password": "Prime@03"
+    },
+    {
+      "id": "p4",
+      "name": "Prime Member 4",
+      "password": "Prime@04"
+    },
+    {
+      "id": "p5",
+      "name": "Prime Member 5",
+      "password": "Prime@05"
+    }
+  ],
+  "judges": [
+    {
+      "id": "j1",
+      "name": "Judge 1",
+      "password": "Judge@01"
+    },
+    {
+      "id": "j2",
+      "name": "Judge 2",
+      "password": "Judge@02"
+    },
+    {
+      "id": "j3",
+      "name": "Judge 3",
+      "password": "Judge@03"
+    }
+  ],
+  "timer": {
+    "endTime": null,
+    "running": false,
+    "label": ""
+  },
+  "battles": [
+    {
+      "id": "battle_1774899862221",
+      "team1Id": "fb1",
+      "team2Id": "fb2",
+      "status": "completed"
+    },
+    {
+      "id": "battle_1774906313580",
+      "team1Id": "fb2",
+      "team2Id": "fb3",
+      "status": "completed"
+    },
+    {
+      "id": "battle_1774906432946",
+      "team1Id": "ca1",
+      "team2Id": "ca2",
+      "status": "completed"
+    }
+  ],
+  "activeBattleId": null,
+  "warVotes": {},
+  "judgeVotes": {
+    "2": {
+      "fb2": {
+        "j2": 19
+      }
+    },
+    "5": {
+      "fb2": {
+        "j1": 0
+      }
+    }
+  },
+  "judgeVotingRound": null
+}

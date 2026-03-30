@@ -32,22 +32,25 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10 sm:py-12">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md animate-fade-in-up">
         <div className="text-center mb-8">
-          <div className="text-[var(--mm-accent)] font-black text-3xl tracking-wide">MAYHEM</div>
-          <div className="mt-2 text-xs font-semibold uppercase tracking-[0.35em] text-white/40">Admin Panel</div>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="h-7 w-1 rounded-full bg-[var(--mm-accent)]" />
+            <div className="text-[var(--mm-accent)] font-black text-2xl tracking-wider">MAYHEM</div>
+          </div>
+          <div className="mm-kicker">Admin Panel</div>
         </div>
 
         <div className="mm-card p-6 md:p-8">
           <div>
             <div className="mm-kicker">Secure Access</div>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight">Sign in</h1>
-            <p className="mt-1 text-sm text-white/60">Enter the master passcode to continue.</p>
+            <h1 className="mt-2 text-xl font-bold tracking-tight">Sign in</h1>
+            <p className="mt-1 text-sm text-white/40">Enter the master passcode to continue.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-white/80 mb-2">Passcode</label>
+              <label className="mm-label">Passcode</label>
               <input
                 type="password"
                 value={password}
@@ -59,7 +62,7 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
             </div>
 
             {error && (
-              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200 text-sm font-semibold">
+              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-red-300 text-sm font-medium animate-scale-in">
                 {error}
               </div>
             )}

@@ -96,6 +96,7 @@ export interface PublicState {
   battles: Battle[];
   activeBattleId: string | null;
   voteCounts: Record<string, number>;
+  warVoterIds: string[];
 }
 
 export const ROUND_NAMES: Record<number, string> = {

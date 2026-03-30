@@ -6,13 +6,17 @@ import { createInitialState, ADMIN_PASSWORD } from './state.js';
 import { calcTotalScore, calcRoundTotal } from './types.js';
 import { initPersistence, loadState, saveState } from './persistence.js';
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+  : ['http://localhost:5173', 'http://localhost:4173'];
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] },
+  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST', 'PUT', 'DELETE'] },
 });
 
-app.use(cors());
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 
 // ─── In-memory state ────────────────────────────────────────────────────────
@@ -111,7 +115,15 @@ function getPublicState() {
     battles: state.battles,
     activeBattleId: state.activeBattleId,
     voteCounts,
+    warVoterIds: Object.keys(state.warVotes),
   };
+}
+
+function getScoringContext() {
+  const voteCounts = getVoteCounts();
+  const activeBattle = state.activeBattleId ? state.battles.find(b => b.id === state.activeBattleId) : null;
+  const warVotingLive = state.currentRound === state.warRound && !!activeBattle && activeBattle.status === 'active';
+  return { voteCounts, activeBattle, warVotingLive };
 }
 
 function getVoteCounts() {
@@ -125,11 +137,19 @@ function getVoteCounts() {
   return counts;
 }
 
+let persistQueue = Promise.resolve();
+
 function broadcastState() {
   io.emit('state:update', getPublicState());
-  void saveState(state, persistence).catch(err => {
-    console.error('Failed to persist state:', err);
-  });
+
+  // Serialize persistence writes to avoid out-of-order saves when many
+  // votes arrive quickly (simultaneous team/prime voting).
+  const snapshot = structuredClone(state);
+  persistQueue = persistQueue
+    .then(() => saveState(snapshot, persistence))
+    .catch(err => {
+      console.error('Failed to persist state:', err);
+    });
 }
 
 // Admin auth middleware
@@ -218,9 +238,10 @@ app.post('/api/admin/login', (req, res) => {
 // ─── Admin: Team management ────────────────────────────────────────────────
 
 app.get('/api/admin/teams', requireAdmin, (_req, res) => {
+  const ctx = getScoringContext();
   res.json(
     state.teams.map(t => ({
-      ...getPublicTeam(t),
+      ...getPublicTeam(t, ctx),
       password: t.password,
     }))
   );
@@ -579,6 +600,10 @@ app.post('/api/vote', (req, res) => {
     res.status(400).json({ error: 'Can only vote for a battling team' });
     return;
   }
+  if (state.warVotes[teamId]) {
+    res.status(409).json({ error: 'You have already voted in this battle' });
+    return;
+  }
   state.warVotes[teamId] = { voteFor, weight: 1 };
   broadcastState();
   res.json({ success: true, votedFor: voteFor });
@@ -599,6 +624,10 @@ app.post('/api/prime/vote', (req, res) => {
   if (!battle) return;
   if (voteFor !== battle.team1Id && voteFor !== battle.team2Id) {
     res.status(400).json({ error: 'Can only vote for a battling team' });
+    return;
+  }
+  if (state.warVotes[primeId]) {
+    res.status(409).json({ error: 'You have already voted in this battle' });
     return;
   }
   state.warVotes[primeId] = { voteFor, weight: 5 };
@@ -674,6 +703,14 @@ setInterval(() => {
     broadcastState();
   }
 }, 500);
+
+// Keep-alive ping for Render free tier (prevents spin-down)
+// Remove this if you are on a paid plan
+if (process.env.RENDER_EXTERNAL_URL) {
+  setInterval(() => {
+    fetch(`${process.env.RENDER_EXTERNAL_URL}/api/state`).catch(() => {});
+  }, 10 * 60 * 1000); // ping every 10 minutes
+}
 
 // ─── Start server ───────────────────────────────────────────────────────────
 
