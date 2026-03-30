@@ -46,66 +46,63 @@ export default function TeamLogin({ onLogin }: TeamLoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-[-5%] left-[-5%] w-64 h-64 bg-[var(--blue-light)] rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
-      <div className="absolute bottom-[-5%] right-[-5%] w-64 h-64 bg-[var(--peach-light)] rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
-      
-      <div className="w-full max-w-md scrapbook-card tape-effect relative z-10 rotate-1 bg-white">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 sm:py-12">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[var(--orange-primary)] shadow-[4px_4px_0_var(--blue-primary)] flex items-center justify-center font-black text-3xl text-white mx-auto mb-6 transform -rotate-6">
-            M
-          </div>
-          <h1 className="font-extrabold text-3xl text-[var(--text-main)] tracking-tight uppercase">Agency Login</h1>
-          <p className="font-hand text-xl text-gray-500 mt-2"><span className="marker-highlight-mint">Marketing Mayhem</span></p>
+          <div className="text-[var(--mm-accent)] font-black text-3xl tracking-wide">MAYHEM</div>
+          <div className="mt-2 text-xs font-semibold uppercase tracking-[0.35em] text-white/40">Team Portal</div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="transform -rotate-1">
-            <label className="block font-hand font-bold text-xl text-gray-700 mb-1">
-              Select Your Agency
-            </label>
-            <select
-              value={teamId}
-              onChange={e => setTeamId(e.target.value)}
-              required
-              className="w-full bg-[var(--paper-bg)] border-2 border-dashed border-gray-400 rounded-none px-4 py-3 text-[var(--text-main)] font-bold focus:outline-none focus:border-[var(--blue-primary)] transition-colors appearance-none shadow-sm"
-            >
-              <option value="" disabled>Choose your team...</option>
-              {teams.map(t => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
+        <div className="mm-card p-6 md:p-8">
+          <div>
+            <div className="mm-kicker">Teams</div>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight">Sign in</h1>
+            <p className="mt-1 text-sm text-white/60">Choose your team and enter the passcode.</p>
           </div>
 
-          <div className="transform rotate-1">
-            <label className="block font-hand font-bold text-xl text-gray-700 mb-1">
-              Secret Passcode
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              placeholder="Enter team password"
-              className="w-full bg-white border-b-2 border-gray-300 px-4 py-3 text-[var(--text-main)] font-bold placeholder:font-hand placeholder:text-gray-400 placeholder:text-lg focus:outline-none focus:border-[var(--orange-primary)] transition-colors"
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border-2 border-red-500 px-4 py-3 text-red-600 font-bold text-center transform -rotate-1 shadow-[4px_4px_0_#DC2626]">
-              {error}
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">Team</label>
+              <select
+                value={teamId}
+                onChange={e => setTeamId(e.target.value)}
+                required
+                className="mm-input"
+              >
+                <option value="" disabled>
+                  Choose your team…
+                </option>
+                {teams.map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[var(--blue-primary)] border-2 border-[var(--blue-primary)] text-white font-black text-xl py-4 px-6 hover:bg-white hover:text-[var(--blue-primary)] transition-all disabled:opacity-50 tracking-wide shadow-[6px_6px_0_var(--orange-primary)] hover:shadow-[2px_2px_0_var(--orange-primary)] hover:translate-x-[4px] hover:translate-y-[4px] mt-4 transform -rotate-2"
-          >
-            {loading ? 'Authenticating...' : 'ENTER ARENA'}
-          </button>
-        </form>
+            <div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">Passcode</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                placeholder="Enter team passcode"
+                className="mm-input"
+              />
+            </div>
+
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200 text-sm font-semibold">
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading} className="mm-btn-primary w-full">
+              {loading ? 'Authenticating…' : 'Continue'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -17,55 +17,54 @@ export default function AdminDashboard() {
 
   if (!state || !adminToken) {
     return (
-      <div className="min-h-screen bg-[var(--paper-bg)] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-white/10 border-t-[var(--mm-accent)] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--paper-bg)] text-[var(--text-main)]">
-      {/* Header */}
-      <header className="border-b bg-white border-b-4 border-red-600 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-orange-500 rounded-lg flex items-center justify-center text-sm">🔒</div>
-            <div>
-              <h1 className="font-black text-lg tracking-tight">ADMIN PANEL</h1>
-              <p className="text-[10px] tracking-[0.2em] uppercase text-red-400/60">Marketing Mayhem</p>
+    <div className="min-h-screen text-white">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="min-w-0">
+            <div className="mm-kicker">Admin Panel</div>
+            <h1 className="mt-1 text-2xl md:text-3xl font-semibold tracking-tight truncate">Control Room</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/70">
+                Round {state.currentRound} — {ROUND_NAMES[state.currentRound]}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400">Round {state.currentRound}</span>
-            <Link
-              to={ROUTES.landing}
-              className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg"
-            >
-              Landing
+
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link to={ROUTES.landing} className="mm-btn-secondary">
+              Back to Landing
             </Link>
-            <button onClick={logoutAdmin} className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg">
+            <button onClick={logoutAdmin} className="mm-btn-primary">
               Logout
             </button>
           </div>
         </div>
       </header>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 flex gap-1">
+      <nav className="border-b border-white/10 bg-black/20">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex gap-2 overflow-x-auto">
           {(['overview', 'scoring', 'timer', 'battles'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-3 text-xs font-bold tracking-[0.15em] uppercase transition-colors border-b-2 ${
-                tab === t ? 'text-orange-400 border-orange-500' : 'text-gray-400 border-transparent hover:text-gray-600'
+              className={`rounded-xl border px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition-colors ${
+                tab === t
+                  ? 'border-white/20 bg-white/10 text-white'
+                  : 'border-transparent text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
-              {t === 'overview' ? '📊 Overview' : t === 'scoring' ? '📝 Scoring' : t === 'timer' ? '⏱️ Timer' : '⚔️ Battles'}
+              {t === 'overview' ? 'Overview' : t === 'scoring' ? 'Scoring' : t === 'timer' ? 'Timer' : 'Battles'}
             </button>
           ))}
         </div>
-      </div>
+      </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {tab === 'overview' && <OverviewTab state={state} adminToken={adminToken} />}
@@ -140,39 +139,43 @@ function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<type
   return (
     <div className="space-y-6">
       {/* Round Control */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
-        <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500 mb-4">Round Control</h3>
-        <div className="flex items-center gap-3">
+      <div className="mm-card p-6 md:p-8">
+        <div className="mm-kicker">Round Control</div>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight">Current round</h2>
+
+        <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
           <select
             value={round}
             onChange={e => setRound(Number(e.target.value))}
-            className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-orange-500/50"
+            className="mm-input sm:max-w-md"
           >
             {[1, 2, 3, 4, 5].map(r => (
-              <option key={r} value={r} className="bg-white">
+              <option key={r} value={r}>
                 Round {r} — {ROUND_NAMES[r]}
               </option>
             ))}
           </select>
           <button
             onClick={changeRound}
-            className="bg-orange-500/20 text-orange-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition-colors"
+            className="mm-btn-primary"
           >
             Set Round
           </button>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <div className="text-xs text-gray-500">
-            Judge voting:{' '}
-            <span className={
-              isWarRound
-                ? 'text-gray-400 font-bold'
-                : isJudgeVotingOpen
-                  ? 'text-emerald-500 font-bold'
-                  : 'text-gray-400 font-bold'
-            }>
-              {isWarRound ? 'DISABLED (WAR ROUND)' : isJudgeVotingOpen ? 'OPEN' : 'CLOSED'}
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="text-sm text-white/60">
+            Judge voting:
+            <span
+              className={`ml-2 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] ${
+                isWarRound
+                  ? 'border-white/10 bg-white/5 text-white/50'
+                  : isJudgeVotingOpen
+                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+                    : 'border-white/10 bg-white/5 text-white/50'
+              }`}
+            >
+              {isWarRound ? 'Disabled (war round)' : isJudgeVotingOpen ? 'Open' : 'Closed'}
             </span>
           </div>
 
@@ -181,63 +184,70 @@ function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<type
               <button
                 onClick={closeJudgeVoting}
                 disabled={judgeVotingLoading}
-                className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors disabled:opacity-40"
+                className="mm-btn-secondary"
               >
-                {judgeVotingLoading ? 'Closing...' : 'Close Voting'}
+                {judgeVotingLoading ? 'Closing…' : 'Close Voting'}
               </button>
             ) : (
               <button
                 onClick={openJudgeVoting}
                 disabled={judgeVotingLoading}
-                className="bg-emerald-500/20 text-emerald-500 px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-500/30 transition-colors disabled:opacity-40"
+                className="mm-btn-primary"
               >
-                {judgeVotingLoading ? 'Starting...' : 'Start Voting'}
+                {judgeVotingLoading ? 'Starting…' : 'Start Voting'}
               </button>
             )
           )}
-
-          {judgeVotingError && <span className="text-red-500 text-xs font-bold">{judgeVotingError}</span>}
         </div>
+
+        {judgeVotingError && (
+          <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200 text-sm font-semibold">
+            {judgeVotingError}
+          </div>
+        )}
       </div>
 
       {/* Team List with passwords */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
-        <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500 mb-4">Teams & Passwords</h3>
-        <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div className="mm-card p-6 md:p-8">
+        <div className="mm-kicker">Teams</div>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight">Teams & passcodes</h2>
+        <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <input
             value={newTeam.id}
             onChange={e => setNewTeam(t => ({ ...t, id: e.target.value }))}
             placeholder="Team ID"
-            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+            className="mm-input px-3 py-2"
           />
           <input
             value={newTeam.name}
             onChange={e => setNewTeam(t => ({ ...t, name: e.target.value }))}
             placeholder="Team name"
-            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+            className="mm-input px-3 py-2"
           />
           <input
             value={newTeam.password}
             onChange={e => setNewTeam(t => ({ ...t, password: e.target.value }))}
             placeholder="Password"
-            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+            className="mm-input px-3 py-2"
           />
           <input
             value={newTeam.domain}
             onChange={e => setNewTeam(t => ({ ...t, domain: e.target.value }))}
             placeholder="Domain"
-            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+            className="mm-input px-3 py-2"
           />
         </div>
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={addTeam}
             disabled={adding || !newTeam.id || !newTeam.name || !newTeam.password}
-            className="bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-500/30 transition-colors disabled:opacity-40"
+            className="mm-btn-primary"
           >
-            {adding ? 'Adding...' : 'Add Team'}
+            {adding ? 'Adding…' : 'Add Team'}
           </button>
-          {addError && <span className="text-red-500 text-xs font-bold">{addError}</span>}
+          {addError && (
+            <span className="text-sm font-semibold text-red-200">{addError}</span>
+          )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {state.teams.map(team => (
@@ -247,11 +257,14 @@ function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<type
       </div>
 
       {/* Leaderboard */}
-      <div className="rounded-xl border border-orange-500/10 bg-white overflow-hidden">
-        <div className="px-6 py-4 border-b border-orange-500/10">
-          <h2 className="font-black text-sm tracking-[0.2em] uppercase text-gray-800">Leaderboard</h2>
+      <div className="mm-card p-0 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/10 bg-black/20">
+          <div className="mm-kicker">Live</div>
+          <h2 className="mt-2 text-lg font-semibold tracking-tight">Leaderboard</h2>
         </div>
-        <Leaderboard teams={state.teams} currentRound={state.currentRound} />
+        <div className="p-2 md:p-4">
+          <Leaderboard teams={state.teams} currentRound={state.currentRound} />
+        </div>
       </div>
     </div>
   );
@@ -285,47 +298,58 @@ function TeamCard({ team, adminToken }: { team: PublicTeam; adminToken: string }
   };
 
   return (
-    <div className={`p-4 rounded-lg border ${team.eliminated ? 'border-red-200 bg-red-50 opacity-60' : 'border-gray-200 bg-white shadow-sm'}`}>
-      <div className="flex items-start justify-between">
+    <div
+      className={`rounded-2xl border p-4 ${
+        team.eliminated ? 'border-red-500/30 bg-red-500/5 opacity-60' : 'border-white/10 bg-black/30'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
         {editing ? (
-          <div className="flex items-center gap-2 flex-1">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
             <input
               value={name}
               onChange={e => setName(e.target.value)}
-              className="flex-1 bg-gray-50 border border-white/20 rounded px-2 py-1 text-sm text-[var(--text-main)] focus:outline-none"
+              className="mm-input px-3 py-2 text-sm"
             />
-            <button onClick={saveName} className="text-emerald-400 text-xs font-bold">Save</button>
+            <button onClick={saveName} className="mm-btn-primary px-3 py-2 text-xs">
+              Save
+            </button>
           </div>
         ) : (
-          <div>
-            <p className="font-bold text-sm">{team.name}</p>
-            <p className="text-[10px] text-gray-400">{team.id}</p>
+          <div className="min-w-0">
+            <p className={`text-sm font-semibold truncate ${team.eliminated ? 'text-white/50 line-through' : 'text-white'}`}>
+              {team.name}
+            </p>
+            <p className="mt-0.5 text-[10px] font-mono text-white/40">{team.id}</p>
           </div>
         )}
-        <button onClick={() => setEditing(!editing)} className="text-gray-400 hover:text-gray-600 text-xs ml-2">
-          {editing ? '✕' : '✏️'}
+
+        <button onClick={() => setEditing(!editing)} className="mm-btn-secondary px-3 py-2 text-xs">
+          {editing ? 'Cancel' : 'Edit'}
         </button>
       </div>
-      <div className="mt-2 flex items-center justify-between">
-        <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-          team.domain === 'Food & Beverages' ? 'bg-emerald-500/10 text-emerald-400' :
-          team.domain === 'Clothing & Apparels' ? 'bg-purple-500/10 text-purple-400' :
-          'bg-cyan-500/10 text-cyan-400'
-        }`}>{team.domain}</span>
-        <span className="font-mono text-sm font-bold text-orange-400">{team.totalScore} pts</span>
+
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/70">
+          {team.domain}
+        </span>
+        <span className="font-mono text-sm font-semibold tabular-nums text-white/80">{team.totalScore} pts</span>
       </div>
-      <div className="mt-2 flex items-center justify-between">
+
+      <div className="mt-3 flex items-center justify-between gap-2">
         <button
           onClick={toggleEliminate}
-          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded ${
-            team.eliminated ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+          className={`mm-btn px-3 py-2 text-xs ${
+            team.eliminated
+              ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/15 focus:ring-emerald-500/30'
+              : 'border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/15 focus:ring-red-500/30'
           }`}
         >
           {team.eliminated ? 'Restore' : 'Eliminate'}
         </button>
         <button
           onClick={removeTeam}
-          className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-gray-100 text-gray-500 hover:bg-gray-200"
+          className="mm-btn border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/15 focus:ring-red-500/30 px-3 py-2 text-xs"
         >
           Remove
         </button>
@@ -343,30 +367,32 @@ function ScoringTab({ state, adminToken }: { state: NonNullable<ReturnType<typeo
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-4 flex-wrap">
-        <div>
-          <label className="block text-xs font-bold tracking-[0.2em] uppercase text-gray-500 mb-2">Team</label>
-          <select
-            value={selectedTeam}
-            onChange={e => setSelectedTeam(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-orange-500/50"
-          >
-            {state.teams.map(t => (
-              <option key={t.id} value={t.id} className="bg-white">{t.name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-bold tracking-[0.2em] uppercase text-gray-500 mb-2">Round</label>
-          <select
-            value={selectedRound}
-            onChange={e => setSelectedRound(Number(e.target.value))}
-            className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-orange-500/50"
-          >
-            {[1, 2, 3, 4, 5].map(r => (
-              <option key={r} value={r} className="bg-white">Round {r} — {ROUND_NAMES[r]}</option>
-            ))}
-          </select>
+      <div className="mm-card p-6 md:p-8">
+        <div className="mm-kicker">Scoring</div>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight">Edit scores</h2>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-white/80 mb-2">Team</label>
+            <select value={selectedTeam} onChange={e => setSelectedTeam(e.target.value)} className="mm-input">
+              {state.teams.map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-white/80 mb-2">Round</label>
+            <select value={selectedRound} onChange={e => setSelectedRound(Number(e.target.value))} className="mm-input">
+              {[1, 2, 3, 4, 5].map(r => (
+                <option key={r} value={r}>
+                  Round {r} — {ROUND_NAMES[r]}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -382,17 +408,17 @@ function ScoringTab({ state, adminToken }: { state: NonNullable<ReturnType<typeo
 function ScoreInput({ label, value, onChange, max, description }: { label: string; value: number; onChange: (v: number) => void; max: number; description?: string }) {
   return (
     <div>
-      <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">
-        {label} <span className="text-gray-400">(max {max})</span>
+      <label className="block text-sm font-semibold text-white/80 mb-2">
+        {label} <span className="text-white/50">(max {max})</span>
       </label>
-      {description && <p className="text-[10px] text-gray-400 mb-1">{description}</p>}
+      {description && <p className="text-xs text-white/50 mb-2">{description}</p>}
       <input
         type="number"
         min={0}
         max={max}
         value={value}
         onChange={e => onChange(Math.min(max, Math.max(0, Number(e.target.value) || 0)))}
-        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[var(--text-main)] font-mono text-sm focus:outline-none focus:border-orange-500/50"
+        className="mm-input font-mono"
       />
     </div>
   );
@@ -668,7 +694,7 @@ function TimerTab({ state, adminToken }: { state: NonNullable<ReturnType<typeof 
       {/* Start New Timer */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
         <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500">Start New Timer</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-gray-500 mb-1">Minutes</label>
             <input
@@ -766,7 +792,7 @@ function BattlesTab({ state, adminToken }: { state: NonNullable<ReturnType<typeo
       {/* Create Battle */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
         <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500">Create Battle</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-gray-500 mb-1">Team 1</label>
             <select
@@ -823,7 +849,7 @@ function BattlesTab({ state, adminToken }: { state: NonNullable<ReturnType<typeo
                 'border-gray-200 bg-white shadow-sm'
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
                   <span className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded ${
                     isActive ? 'bg-red-500/20 text-red-400' :
@@ -833,7 +859,7 @@ function BattlesTab({ state, adminToken }: { state: NonNullable<ReturnType<typeo
                     {battle.status}
                   </span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {!isCompleted && !isActive && (
                     <button onClick={() => activateBattle(battle.id)} className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30">
                       Go Live
@@ -852,7 +878,7 @@ function BattlesTab({ state, adminToken }: { state: NonNullable<ReturnType<typeo
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1 text-center">
                   <p className="font-bold">{t1?.name}</p>
                   {isActive && (

@@ -31,49 +31,44 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-[var(--paper-bg)]">
-      {/* Background decoration */}
-      <div className="absolute top-[-5%] left-[-5%] w-64 h-64 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
-      <div className="absolute bottom-[-5%] right-[-5%] w-64 h-64 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
-      
-      <div className="w-full max-w-md scrapbook-card tape-effect relative z-10 -rotate-1 bg-white border-t-8 border-t-red-600">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 sm:py-12">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-red-600 shadow-[4px_4px_0_var(--text-main)] flex items-center justify-center text-3xl mx-auto mb-6 transform rotate-6">
-            🔒
-          </div>
-          <h1 className="font-extrabold text-3xl text-[var(--text-main)] tracking-tight uppercase">ADMIN ACCESS</h1>
-          <p className="font-hand text-xl text-gray-500 mt-2"><span className="marker-highlight-peach">Marketing Mayhem Control Panel</span></p>
+          <div className="text-[var(--mm-accent)] font-black text-3xl tracking-wide">MAYHEM</div>
+          <div className="mt-2 text-xs font-semibold uppercase tracking-[0.35em] text-white/40">Admin Panel</div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="transform rotate-1">
-            <label className="block font-hand font-bold text-xl text-gray-700 mb-1">
-              Master Passcode
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              placeholder="Enter admin password"
-              className="w-full bg-white border-b-2 border-red-300 px-4 py-3 text-[var(--text-main)] font-bold placeholder:font-hand placeholder:text-gray-400 placeholder:text-lg focus:outline-none focus:border-red-600 transition-colors"
-            />
+        <div className="mm-card p-6 md:p-8">
+          <div>
+            <div className="mm-kicker">Secure Access</div>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight">Sign in</h1>
+            <p className="mt-1 text-sm text-white/60">Enter the master passcode to continue.</p>
           </div>
 
-          {error && (
-            <div className="bg-red-50 border-2 border-red-500 px-4 py-3 text-red-600 font-bold text-center transform rotate-1 shadow-[4px_4px_0_#DC2626]">
-              {error}
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">Passcode</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                placeholder="Enter admin passcode"
+                className="mm-input"
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-red-600 border-2 border-red-600 text-white font-black text-xl py-4 px-6 hover:bg-white hover:text-red-600 transition-all disabled:opacity-50 tracking-wide shadow-[6px_6px_0_var(--text-main)] hover:shadow-[2px_2px_0_var(--text-main)] hover:translate-x-[4px] hover:translate-y-[4px] mt-4 transform rotate-1"
-          >
-            {loading ? 'Authenticating...' : 'ACCESS DASHBOARD'}
-          </button>
-        </form>
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200 text-sm font-semibold">
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading} className="mm-btn-primary w-full">
+              {loading ? 'Authenticating…' : 'Continue'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

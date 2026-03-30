@@ -18,7 +18,7 @@ export default function JudgeDashboard() {
   if (!state || !judgeAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 rounded-full border-4 border-white/10 border-t-[var(--mm-accent)] animate-spin" />
       </div>
     );
   }
@@ -53,103 +53,116 @@ export default function JudgeDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--paper-bg)] text-[var(--text-main)]">
-      <header className="border-b bg-white border-b-4 border-red-600 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-orange-500 rounded-lg flex items-center justify-center text-sm">⚖️</div>
-            <div>
-              <h1 className="font-black text-lg tracking-tight">JUDGE PANEL</h1>
-              <p className="text-[10px] tracking-[0.2em] uppercase text-red-400/60">Marketing Mayhem</p>
+    <div className="min-h-screen pb-12 text-white">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/40 backdrop-blur">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="mm-kicker">Judge Portal</div>
+            <h1 className="mt-1 text-2xl md:text-3xl font-semibold tracking-tight truncate">{judgeAuth.name}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/70">
+                Round {state.currentRound}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/70">
+                {votingOpen ? 'Voting open' : 'Voting closed'}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400">Round {state.currentRound}</span>
-            <Link
-              to={ROUTES.landing}
-              className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg"
-            >
-              Landing
+
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link to={ROUTES.landing} className="mm-btn-secondary">
+              Back to Landing
             </Link>
-            <button onClick={logoutJudge} className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg">
+            <button onClick={logoutJudge} className="mm-btn-primary">
               Logout
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         {state.timer.running && (
-          <TimerDisplay
-            endTime={state.timer.endTime}
-            running={state.timer.running}
-            label={state.timer.label}
-            large
-          />
+          <TimerDisplay endTime={state.timer.endTime} running={state.timer.running} label={state.timer.label} large />
         )}
 
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
-          <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500">Judge Voting</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <section className="mm-card p-6 md:p-8">
+          <div>
+            <div className="mm-kicker">Judge Voting</div>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight">Submit scores for Round {round}</h2>
+            <p className="mt-1 text-sm text-white/60">Scoring opens only when the admin starts voting.</p>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">Round</label>
-              <div className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm">
-                Round {round}
-              </div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">Round</label>
+              <input value={`Round ${round}`} readOnly className="mm-input opacity-80" />
             </div>
+
             <div>
-              <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">Team</label>
-              <select
-                value={teamId}
-                onChange={e => setTeamId(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-orange-500/50"
-              >
-                <option value="" className="bg-white">Select...</option>
+              <label className="block text-sm font-semibold text-white/80 mb-2">Team</label>
+              <select value={teamId} onChange={e => setTeamId(e.target.value)} className="mm-input">
+                <option value="">Select…</option>
                 {state.teams.map(t => (
-                  <option key={t.id} value={t.id} className="bg-white">{t.name}</option>
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
                 ))}
               </select>
             </div>
+
             <div>
-              <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">Points</label>
+              <label className="block text-sm font-semibold text-white/80 mb-2">Points</label>
               <input
                 type="number"
                 min={0}
                 max={100}
                 value={points}
                 onChange={e => setPoints(Math.min(100, Math.max(0, Number(e.target.value) || 0)))}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] font-mono text-sm focus:outline-none focus:border-orange-500/50"
+                className="mm-input font-mono"
               />
             </div>
           </div>
 
           {isWarRound && (
-            <div className="text-xs text-red-500 font-bold">Judges cannot vote during the war round.</div>
+            <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-amber-200 text-sm font-semibold">
+              Judges cannot vote during the war round.
+            </div>
           )}
 
           {!isWarRound && !votingOpen && (
-            <div className="text-xs text-gray-500 font-bold">Voting is closed. Waiting for admin to start voting for Round {round}.</div>
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/70 text-sm font-semibold">
+              Voting is closed. Waiting for admin to start voting for Round {round}.
+            </div>
           )}
 
-          <button
-            onClick={submitVote}
-            disabled={!teamId || loading || !votingOpen}
-            className="bg-orange-500/20 text-orange-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition-colors disabled:opacity-40"
-          >
-            {loading ? 'Submitting...' : 'Submit Score'}
-          </button>
-
-          {error && <p className="text-red-600 text-sm font-bold">{error}</p>}
-          {success && <p className="text-emerald-600 text-sm font-bold">{success}</p>}
-        </div>
-
-        <div className="rounded-xl border border-orange-500/10 bg-white overflow-hidden">
-          <div className="px-6 py-4 border-b border-orange-500/10">
-            <h2 className="font-black text-sm tracking-[0.2em] uppercase text-gray-800">Leaderboard</h2>
+          <div className="mt-5 flex items-center gap-3 flex-wrap">
+            <button onClick={submitVote} disabled={!teamId || loading || !votingOpen} className="mm-btn-primary">
+              {loading ? 'Submitting…' : 'Submit Score'}
+            </button>
           </div>
-          <Leaderboard teams={state.teams} currentRound={state.currentRound} compact />
-        </div>
-      </div>
+
+          {error && (
+            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200 text-sm font-semibold">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-200 text-sm font-semibold">
+              {success}
+            </div>
+          )}
+        </section>
+
+        <section className="mm-card p-0 overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/10 bg-black/20">
+            <div className="mm-kicker">Live</div>
+            <h2 className="mt-2 text-lg font-semibold tracking-tight">Leaderboard</h2>
+          </div>
+          <div className="p-2 md:p-4">
+            <Leaderboard teams={state.teams} currentRound={state.currentRound} compact />
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

@@ -13,97 +13,133 @@ export default function Leaderboard({ teams, currentRound, compact }: Leaderboar
     return b.totalScore - a.totalScore;
   });
 
+  const roundsToShow = compact
+    ? []
+    : Array.from({ length: Math.min(currentRound, 5) }, (_, i) => i + 1);
+
   return (
-    <div className="w-full font-sans">
+    <div className="w-full">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="min-w-full border-separate border-spacing-0 text-xs sm:text-sm">
           <thead>
-            <tr className="border-b-[3px] border-black">
-              <th className="py-4 px-4 text-left font-black tracking-widest uppercase text-black">Rank</th>
-              <th className="py-4 px-4 text-left font-black tracking-widest uppercase text-black">Agency</th>
+            <tr className="bg-black/40">
+              <th className="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/60">Rank</th>
+              <th className="px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/60">Team</th>
               {!compact && (
-                <th className="py-4 px-4 text-left font-black tracking-widest uppercase text-black">Domain</th>
-              )}
-              {!compact && Array.from({ length: Math.min(currentRound, 5) }, (_, i) => i + 1).map(r => (
-                <th key={r} className="py-4 px-2 text-center font-bold tracking-widest uppercase text-gray-500 text-sm">
-                  R{r}
+                <th className="hidden md:table-cell px-3 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/60">
+                  Domain
                 </th>
-              ))}
-              <th className="py-4 px-4 text-right font-black tracking-widest uppercase text-black">Score</th>
+              )}
+              {!compact &&
+                roundsToShow.map(r => (
+                  <th
+                    key={r}
+                    className="hidden lg:table-cell px-2 py-3 text-center text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/40"
+                  >
+                    R{r}
+                  </th>
+                ))}
+              <th className="px-3 sm:px-4 py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/60">Total</th>
             </tr>
           </thead>
           <tbody>
-            {sorted.map((team, idx) => (
-              <tr
-                key={team.id}
-                className={`
-                  border-b border-gray-200 transition-all duration-300
-                  ${team.eliminated
-                    ? 'opacity-50 bg-gray-50 grayscale'
-                    : 'hover:bg-gray-50'
-                  }
-                `}
-              >
-                <td className="py-4 px-4">
-                  <span className={`
-                    font-hand text-3xl font-bold
-                    ${!team.eliminated && idx === 0 ? 'text-[#FFD700]' : !team.eliminated && idx === 1 ? 'text-[#C0C0C0]' : !team.eliminated && idx === 2 ? 'text-[#CD7F32]' : 'text-gray-400'}
-                  `}>
-                    {team.eliminated ? '—' : `#${idx + 1}`}
-                  </span>
-                </td>
-                <td className="py-4 px-4">
-                  <div className="flex items-center gap-2">
-                    <span className={`font-bold text-lg ${team.eliminated ? 'line-through text-gray-400' : 'text-[var(--blue-primary)]'} ${!team.eliminated && idx < 3 ? 'marker-highlight' : ''}`}>
-                      {team.name}
-                    </span>
-                    {team.eliminated && (
-                      <span className="font-hand text-xl text-red-600 border-2 border-red-600 px-2 py-0.5 transform -rotate-6 shadow-sm inline-block ml-2">
-                        ELIMINATED
-                      </span>
-                    )}
-                  </div>
-                </td>
-                {!compact && (
-                  <td className="py-4 px-4">
-                    <span className={`text-xs font-bold px-3 py-1 border-[1.5px] border-black shadow-[2px_2px_0_#000] rotate-1 inline-block bg-white ${
-                      team.domain === 'Food & Beverages'
-                        ? 'text-[var(--orange-primary)]'
-                        : team.domain === 'Clothing & Apparels'
-                          ? 'text-[#E1306C]'
-                          : 'text-[var(--blue-primary)]'
-                    }`}>
-                      {team.domain === 'Food & Beverages' ? '🍔 F&B' : team.domain === 'Clothing & Apparels' ? '👕 C&A' : '🎬 M&E'}
+            {sorted.map((team, idx) => {
+              const isTop = !team.eliminated && idx === 0;
+              const rank = team.eliminated ? '—' : `#${idx + 1}`;
+
+              return (
+                <tr
+                  key={team.id}
+                  className={`border-b border-white/10 ${team.eliminated ? 'opacity-50' : 'hover:bg-white/5'}`}
+                >
+                  <td className="px-3 sm:px-4 py-3">
+                    <span
+                      className={
+                        `inline-flex min-w-[3.5rem] items-center justify-center rounded-lg border px-2 py-1 font-mono text-xs tabular-nums ${
+                          team.eliminated
+                            ? 'border-white/10 bg-black/30 text-white/50'
+                            : isTop
+                              ? 'border-[var(--mm-accent)]/40 bg-[var(--mm-accent)]/15 text-white'
+                              : 'border-white/10 bg-black/30 text-white/70'
+                        }`
+                      }
+                    >
+                      {rank}
                     </span>
                   </td>
-                )}
-                {!compact && Array.from({ length: Math.min(currentRound, 5) }, (_, i) => i + 1).map(r => {
-                  const key = `round${r}` as keyof typeof team.roundScores;
-                  return (
-                    <td key={r} className="py-4 px-2 text-center">
-                      <span className="font-hand text-2xl text-gray-600 font-bold">
-                        {team.roundScores[key]}
+
+                  <td className="px-3 sm:px-4 py-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span
+                        className={
+                          `h-2 w-2 rounded-full ${
+                            team.eliminated
+                              ? 'bg-white/20'
+                              : isTop
+                                ? 'bg-[var(--mm-accent)]'
+                                : 'bg-white/40'
+                          }`
+                        }
+                      />
+                      <div className="min-w-0">
+                        <div className={`truncate font-semibold ${team.eliminated ? 'line-through text-white/40' : 'text-white'}`}>
+                          {team.name}
+                        </div>
+                        {team.eliminated && (
+                          <div className="mt-0.5 text-xs font-semibold uppercase tracking-[0.25em] text-red-300/80">
+                            Eliminated
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+
+                  {!compact && (
+                    <td className="hidden md:table-cell px-3 sm:px-4 py-3">
+                      <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/70">
+                        {team.domain}
                       </span>
                     </td>
-                  );
-                })}
-                <td className="py-4 px-4 text-right">
-                  <span className={`
-                    font-hand text-3xl font-black
-                    ${!team.eliminated && idx === 0 ? 'text-[var(--orange-primary)] marker-highlight-blue' : 'text-gray-800'}
-                  `}>
-                    {team.totalScore}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                  )}
+
+                  {!compact &&
+                    roundsToShow.map(r => {
+                      const key = `round${r}` as keyof typeof team.roundScores;
+                      return (
+                        <td key={r} className="hidden lg:table-cell px-2 py-3 text-center">
+                          <span className="font-mono text-sm tabular-nums text-white/70">
+                            {team.roundScores[key]}
+                          </span>
+                        </td>
+                      );
+                    })}
+
+                  <td className="px-3 sm:px-4 py-3 text-right">
+                    <span
+                      className={
+                        `font-mono text-base font-semibold tabular-nums ${
+                          team.eliminated ? 'text-white/50' : isTop ? 'text-white' : 'text-white/80'
+                        }`
+                      }
+                    >
+                      {team.totalScore}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
       {!compact && (
-        <div className="mt-6 px-4 py-3 bg-[var(--blue-light)] border border-[var(--blue-primary)] flex items-center justify-between font-bold text-sm text-[var(--blue-primary)] -rotate-1 shadow-sm mx-2">
-          <span>Current Round: {currentRound} — {ROUND_NAMES[currentRound]}</span>
-          <span>{teams.filter(t => !t.eliminated).length} Agents Active</span>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-2 text-xs text-white/60">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--mm-accent)]" />
+            <span className="font-semibold text-white/80">Round {currentRound}</span>
+            <span className="text-white/50">— {ROUND_NAMES[currentRound]}</span>
+          </div>
+          <div>{teams.filter(t => !t.eliminated).length} active teams</div>
         </div>
       )}
     </div>
