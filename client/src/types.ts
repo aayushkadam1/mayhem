@@ -3,10 +3,12 @@ export interface Round1Scores {
   taglineCreativity: number;
   audienceInsight: number;
   bonusTokens: number;
+  judgeVotes: number;
 }
 
 export interface Round2Scores {
   remainingTokens: number;
+  judgeVotes: number;
 }
 
 export interface Round3Scores {
@@ -15,6 +17,7 @@ export interface Round3Scores {
   performance: number;
   clarity: number;
   engagement: number;
+  judgeVotes: number;
 }
 
 export interface Round4Scores {
@@ -30,6 +33,7 @@ export interface Round5Scores {
   creativity: number;
   feasibility: number;
   delivery: number;
+  judgeVotes: number;
 }
 
 export interface TeamScores {
@@ -60,6 +64,16 @@ export interface AdminTeam extends PublicTeam {
   password: string;
 }
 
+export interface PrimeMember {
+  id: string;
+  name: string;
+}
+
+export interface JudgeMember {
+  id: string;
+  name: string;
+}
+
 export interface Battle {
   id: string;
   team1Id: string;
@@ -75,6 +89,7 @@ export interface TimerState {
 
 export interface PublicState {
   currentRound: number;
+  warRound: number;
   teams: PublicTeam[];
   timer: TimerState;
   battles: Battle[];

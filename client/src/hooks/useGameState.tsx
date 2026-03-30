@@ -66,9 +66,15 @@ export function useTimerEnded(callback: () => void) {
 
 interface AuthState {
   teamAuth: { teamId: string; password: string; name: string } | null;
+  primeAuth: { primeId: string; password: string; name: string } | null;
+  judgeAuth: { judgeId: string; password: string; name: string } | null;
   adminToken: string | null;
   loginTeam: (teamId: string, password: string, name: string) => void;
   logoutTeam: () => void;
+  loginPrime: (primeId: string, password: string, name: string) => void;
+  logoutPrime: () => void;
+  loginJudge: (judgeId: string, password: string, name: string) => void;
+  logoutJudge: () => void;
   loginAdmin: (token: string) => void;
   logoutAdmin: () => void;
 }
@@ -79,6 +85,20 @@ function useAuthInternal() {
   const [teamAuth, setTeamAuth] = useState<{ teamId: string; password: string; name: string } | null>(() => {
     try {
       const saved = localStorage.getItem('mm_team_auth');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+
+  const [primeAuth, setPrimeAuth] = useState<{ primeId: string; password: string; name: string } | null>(() => {
+    try {
+      const saved = localStorage.getItem('mm_prime_auth');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+
+  const [judgeAuth, setJudgeAuth] = useState<{ judgeId: string; password: string; name: string } | null>(() => {
+    try {
+      const saved = localStorage.getItem('mm_judge_auth');
       return saved ? JSON.parse(saved) : null;
     } catch { return null; }
   });
@@ -98,6 +118,28 @@ function useAuthInternal() {
     localStorage.removeItem('mm_team_auth');
   }, []);
 
+  const loginPrime = useCallback((primeId: string, password: string, name: string) => {
+    const auth = { primeId, password, name };
+    setPrimeAuth(auth);
+    localStorage.setItem('mm_prime_auth', JSON.stringify(auth));
+  }, []);
+
+  const logoutPrime = useCallback(() => {
+    setPrimeAuth(null);
+    localStorage.removeItem('mm_prime_auth');
+  }, []);
+
+  const loginJudge = useCallback((judgeId: string, password: string, name: string) => {
+    const auth = { judgeId, password, name };
+    setJudgeAuth(auth);
+    localStorage.setItem('mm_judge_auth', JSON.stringify(auth));
+  }, []);
+
+  const logoutJudge = useCallback(() => {
+    setJudgeAuth(null);
+    localStorage.removeItem('mm_judge_auth');
+  }, []);
+
   const loginAdmin = useCallback((token: string) => {
     setAdminToken(token);
     localStorage.setItem('mm_admin_token', token);
@@ -108,7 +150,20 @@ function useAuthInternal() {
     localStorage.removeItem('mm_admin_token');
   }, []);
 
-  return { teamAuth, adminToken, loginTeam, logoutTeam, loginAdmin, logoutAdmin };
+  return {
+    teamAuth,
+    primeAuth,
+    judgeAuth,
+    adminToken,
+    loginTeam,
+    logoutTeam,
+    loginPrime,
+    logoutPrime,
+    loginJudge,
+    logoutJudge,
+    loginAdmin,
+    logoutAdmin,
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

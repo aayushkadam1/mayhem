@@ -73,12 +73,31 @@ export default function AdminDashboard() {
 
 function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<typeof useGameState>>; adminToken: string }) {
   const [round, setRound] = useState(state.currentRound);
+  const [newTeam, setNewTeam] = useState({ id: '', name: '', password: '', domain: '' });
+  const [addError, setAddError] = useState('');
+  const [adding, setAdding] = useState(false);
 
   const changeRound = async () => {
     await adminApi('/api/admin/round', adminToken, {
       method: 'PUT',
       body: JSON.stringify({ round }),
     });
+  };
+
+  const addTeam = async () => {
+    setAddError('');
+    setAdding(true);
+    try {
+      await adminApi('/api/admin/teams', adminToken, {
+        method: 'POST',
+        body: JSON.stringify(newTeam),
+      });
+      setNewTeam({ id: '', name: '', password: '', domain: '' });
+    } catch (err: unknown) {
+      setAddError(err instanceof Error ? err.message : 'Failed to add team');
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
@@ -110,6 +129,42 @@ function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<type
       {/* Team List with passwords */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
         <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500 mb-4">Teams & Passwords</h3>
+        <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input
+            value={newTeam.id}
+            onChange={e => setNewTeam(t => ({ ...t, id: e.target.value }))}
+            placeholder="Team ID"
+            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+          />
+          <input
+            value={newTeam.name}
+            onChange={e => setNewTeam(t => ({ ...t, name: e.target.value }))}
+            placeholder="Team name"
+            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+          />
+          <input
+            value={newTeam.password}
+            onChange={e => setNewTeam(t => ({ ...t, password: e.target.value }))}
+            placeholder="Password"
+            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+          />
+          <input
+            value={newTeam.domain}
+            onChange={e => setNewTeam(t => ({ ...t, domain: e.target.value }))}
+            placeholder="Domain"
+            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500/50"
+          />
+        </div>
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={addTeam}
+            disabled={adding || !newTeam.id || !newTeam.name || !newTeam.password}
+            className="bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-500/30 transition-colors disabled:opacity-40"
+          >
+            {adding ? 'Adding...' : 'Add Team'}
+          </button>
+          {addError && <span className="text-red-500 text-xs font-bold">{addError}</span>}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {state.teams.map(team => (
             <TeamCard key={team.id} team={team} adminToken={adminToken} />
@@ -144,6 +199,14 @@ function TeamCard({ team, adminToken }: { team: PublicTeam; adminToken: string }
     await adminApi(`/api/admin/team/${team.id}/eliminate`, adminToken, {
       method: 'PUT',
       body: JSON.stringify({ eliminated: !team.eliminated }),
+    });
+  };
+
+  const removeTeam = async () => {
+    const confirmed = window.confirm(`Remove ${team.name}? This cannot be undone.`);
+    if (!confirmed) return;
+    await adminApi(`/api/admin/team/${team.id}`, adminToken, {
+      method: 'DELETE',
     });
   };
 
@@ -185,6 +248,12 @@ function TeamCard({ team, adminToken }: { team: PublicTeam; adminToken: string }
           }`}
         >
           {team.eliminated ? 'Restore' : 'Eliminate'}
+        </button>
+        <button
+          onClick={removeTeam}
+          className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-gray-100 text-gray-500 hover:bg-gray-200"
+        >
+          Remove
         </button>
       </div>
     </div>
@@ -268,6 +337,8 @@ function Round1Form({ team, adminToken }: { team: PublicTeam; adminToken: string
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const total = scores.insightAccuracy + scores.taglineCreativity + scores.audienceInsight + scores.judgeVotes;
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
       <h3 className="font-bold text-sm text-gray-800">Round 1 — Marketing Relay <span className="text-gray-400 text-xs">(Max 20 pts)</span></h3>
@@ -275,6 +346,7 @@ function Round1Form({ team, adminToken }: { team: PublicTeam; adminToken: string
         <ScoreInput label="Insight Selection Accuracy" value={scores.insightAccuracy} onChange={v => setScores(s => ({ ...s, insightAccuracy: v }))} max={5} description="How closely the selected option aligns with the hidden problem statement" />
         <ScoreInput label="Tagline Relevance & Creativity" value={scores.taglineCreativity} onChange={v => setScores(s => ({ ...s, taglineCreativity: v }))} max={5} description="Brand tagline quality and connection to insight" />
         <ScoreInput label="Audience & Insight Deduction" value={scores.audienceInsight} onChange={v => setScores(s => ({ ...s, audienceInsight: v }))} max={10} description="Accuracy of target audience and consumer insight deduction" />
+        <ScoreInput label="Judge Votes" value={scores.judgeVotes} onChange={v => setScores(s => ({ ...s, judgeVotes: v }))} max={100} description="Judge points (no multiplier)" />
         <div>
           <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">
             Bonus Tokens <span className="text-gray-400">(0, 10, or 20)</span>
@@ -296,7 +368,7 @@ function Round1Form({ team, adminToken }: { team: PublicTeam; adminToken: string
           Save Scores
         </button>
         {saved && <span className="text-emerald-400 text-sm">Saved!</span>}
-        <span className="text-gray-400 text-xs ml-auto">Total: {scores.insightAccuracy + scores.taglineCreativity + scores.audienceInsight}/20 pts</span>
+        <span className="text-gray-400 text-xs ml-auto">Total: {total} pts</span>
       </div>
     </div>
   );
@@ -304,6 +376,7 @@ function Round1Form({ team, adminToken }: { team: PublicTeam; adminToken: string
 
 function Round2Form({ team, adminToken }: { team: PublicTeam; adminToken: string }) {
   const [remainingTokens, setRemainingTokens] = useState(team.scores.round2.remainingTokens);
+  const [judgeVotes, setJudgeVotes] = useState(team.scores.round2.judgeVotes);
   const [saved, setSaved] = useState(false);
 
   const budget = 100 + team.scores.round1.bonusTokens + (
@@ -314,7 +387,7 @@ function Round2Form({ team, adminToken }: { team: PublicTeam; adminToken: string
   const save = async () => {
     await adminApi(`/api/admin/scores/${team.id}/round2`, adminToken, {
       method: 'PUT',
-      body: JSON.stringify({ remainingTokens }),
+      body: JSON.stringify({ remainingTokens, judgeVotes }),
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -340,12 +413,25 @@ function Round2Form({ team, adminToken }: { team: PublicTeam; adminToken: string
           className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[var(--text-main)] font-mono text-sm focus:outline-none focus:border-orange-500/50"
         />
       </div>
+      <div>
+        <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">
+          Judge Votes <span className="text-gray-400">(no multiplier)</span>
+        </label>
+        <input
+          type="number"
+          min={0}
+          max={100}
+          value={judgeVotes}
+          onChange={e => setJudgeVotes(Math.min(100, Math.max(0, Number(e.target.value) || 0)))}
+          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[var(--text-main)] font-mono text-sm focus:outline-none focus:border-orange-500/50"
+        />
+      </div>
       <div className="flex items-center gap-3">
         <button onClick={save} className="bg-orange-500/20 text-orange-400 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition-colors">
           Save
         </button>
         {saved && <span className="text-emerald-400 text-sm">Saved!</span>}
-        <span className="text-gray-400 text-xs ml-auto">Score: {Math.floor(remainingTokens / 20)} pts</span>
+        <span className="text-gray-400 text-xs ml-auto">Score: {Math.floor(remainingTokens / 20) + judgeVotes} pts</span>
       </div>
     </div>
   );
@@ -364,7 +450,7 @@ function Round3Form({ team, adminToken }: { team: PublicTeam; adminToken: string
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const total = scores.creativity + scores.relevance + scores.performance + scores.clarity + scores.engagement;
+  const total = scores.creativity + scores.relevance + scores.performance + scores.clarity + scores.engagement + scores.judgeVotes;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
@@ -375,6 +461,7 @@ function Round3Form({ team, adminToken }: { team: PublicTeam; adminToken: string
         <ScoreInput label="Performance" value={scores.performance} onChange={v => setScores(s => ({ ...s, performance: v }))} max={5} description="Acting, confidence, coordination" />
         <ScoreInput label="Clarity" value={scores.clarity} onChange={v => setScores(s => ({ ...s, clarity: v }))} max={5} description="Message communication" />
         <ScoreInput label="Engagement" value={scores.engagement} onChange={v => setScores(s => ({ ...s, engagement: v }))} max={5} description="Audience impact" />
+        <ScoreInput label="Judge Votes" value={scores.judgeVotes} onChange={v => setScores(s => ({ ...s, judgeVotes: v }))} max={100} description="Judge points (no multiplier)" />
       </div>
       <div className="flex items-center gap-3">
         <button onClick={save} className="bg-orange-500/20 text-orange-400 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition-colors">
@@ -441,7 +528,7 @@ function Round5Form({ team, adminToken }: { team: PublicTeam; adminToken: string
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const total = scores.insight + scores.strategy + scores.creativity + scores.feasibility + scores.delivery;
+  const total = scores.insight + scores.strategy + scores.creativity + scores.feasibility + scores.delivery + scores.judgeVotes;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
@@ -452,13 +539,14 @@ function Round5Form({ team, adminToken }: { team: PublicTeam; adminToken: string
         <ScoreInput label="Creativity" value={scores.creativity} onChange={v => setScores(s => ({ ...s, creativity: v }))} max={10} description="Branding & uniqueness" />
         <ScoreInput label="Feasibility" value={scores.feasibility} onChange={v => setScores(s => ({ ...s, feasibility: v }))} max={10} description="Practicality of execution" />
         <ScoreInput label="Delivery" value={scores.delivery} onChange={v => setScores(s => ({ ...s, delivery: v }))} max={10} description="Pitch quality & persuasion" />
+        <ScoreInput label="Judge Votes" value={scores.judgeVotes} onChange={v => setScores(s => ({ ...s, judgeVotes: v }))} max={100} description="Judge points (no multiplier)" />
       </div>
       <div className="flex items-center gap-3">
         <button onClick={save} className="bg-orange-500/20 text-orange-400 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition-colors">
           Save Scores
         </button>
         {saved && <span className="text-emerald-400 text-sm">Saved!</span>}
-        <span className="text-gray-400 text-xs ml-auto">Total: {total}/50 pts</span>
+        <span className="text-gray-400 text-xs ml-auto">Total: {total} pts</span>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import { createInitialState, ADMIN_PASSWORD } from './state.js';
 import { calcTotalScore, calcRoundTotal } from './types.js';
+import { initPersistence, loadState, saveState } from './persistence.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -15,7 +16,14 @@ app.use(cors());
 app.use(express.json());
 
 // ─── In-memory state ────────────────────────────────────────────────────────
-let state = createInitialState();
+const persistence = await initPersistence();
+let state = await loadState(createInitialState, persistence);
+if (!state.warRound) state.warRound = 4;
+if (!state.warVotes) state.warVotes = {};
+if (!state.judgeVotes) state.judgeVotes = {};
+if (!state.primes) state.primes = [];
+if (!state.judges) state.judges = [];
+syncAllJudgeVotes();
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function getPublicTeam(t) {
@@ -36,9 +44,49 @@ function getPublicTeam(t) {
   };
 }
 
+function makeEmptyScores() {
+  return {
+    round1: { insightAccuracy: 0, taglineCreativity: 0, audienceInsight: 0, bonusTokens: 0, judgeVotes: 0 },
+    round2: { remainingTokens: 0, judgeVotes: 0 },
+    round3: { creativity: 0, relevance: 0, performance: 0, clarity: 0, engagement: 0, judgeVotes: 0 },
+    round4: { strategy: 0, creativity: 0, impact: 0, audienceVotes: 0 },
+    round5: { insight: 0, strategy: 0, creativity: 0, feasibility: 0, delivery: 0, judgeVotes: 0 },
+  };
+}
+
+function getJudgeVoteTotal(round, teamId) {
+  const roundVotes = state.judgeVotes?.[round] || {};
+  const teamVotes = roundVotes[teamId] || {};
+  return Object.values(teamVotes).reduce((sum, v) => sum + (Number(v) || 0), 0);
+}
+
+function syncJudgeVoteTotal(round, teamId) {
+  const team = state.teams.find(t => t.id === teamId);
+  if (!team) return;
+  const total = getJudgeVoteTotal(round, teamId);
+  if (round === 1) team.scores.round1.judgeVotes = total;
+  if (round === 2) team.scores.round2.judgeVotes = total;
+  if (round === 3) team.scores.round3.judgeVotes = total;
+  if (round === 5) team.scores.round5.judgeVotes = total;
+}
+
+function setJudgeVote(round, teamId, judgeId, points) {
+  if (!state.judgeVotes[round]) state.judgeVotes[round] = {};
+  if (!state.judgeVotes[round][teamId]) state.judgeVotes[round][teamId] = {};
+  state.judgeVotes[round][teamId][judgeId] = points;
+  syncJudgeVoteTotal(round, teamId);
+}
+
+function syncAllJudgeVotes() {
+  for (const team of state.teams) {
+    [1, 2, 3, 5].forEach(round => syncJudgeVoteTotal(round, team.id));
+  }
+}
+
 function getPublicState() {
   return {
     currentRound: state.currentRound,
+    warRound: state.warRound,
     teams: state.teams.map(getPublicTeam),
     timer: state.timer,
     battles: state.battles,
@@ -49,14 +97,20 @@ function getPublicState() {
 
 function getVoteCounts() {
   const counts = {};
-  for (const votedFor of Object.values(state.votes)) {
-    counts[votedFor] = (counts[votedFor] || 0) + 1;
+  for (const entry of Object.values(state.warVotes)) {
+    if (!entry || !entry.voteFor) continue;
+    const weight = Number(entry.weight) || 0;
+    if (weight <= 0) continue;
+    counts[entry.voteFor] = (counts[entry.voteFor] || 0) + weight;
   }
   return counts;
 }
 
 function broadcastState() {
   io.emit('state:update', getPublicState());
+  void saveState(state, persistence).catch(err => {
+    console.error('Failed to persist state:', err);
+  });
 }
 
 // Admin auth middleware
@@ -91,6 +145,46 @@ app.post('/api/team/login', (req, res) => {
   res.json({ teamId: team.id, name: team.name, domain: team.domain });
 });
 
+// ─── Prime auth ─────────────────────────────────────────────────────────────
+
+app.get('/api/prime/list', (_req, res) => {
+  res.json(state.primes.map(p => ({ id: p.id, name: p.name })));
+});
+
+app.post('/api/prime/login', (req, res) => {
+  const { primeId, password } = req.body;
+  if (!primeId || !password) {
+    res.status(400).json({ error: 'primeId and password required' });
+    return;
+  }
+  const prime = state.primes.find(p => p.id === primeId);
+  if (!prime || prime.password !== password) {
+    res.status(401).json({ error: 'Invalid prime credentials' });
+    return;
+  }
+  res.json({ primeId: prime.id, name: prime.name });
+});
+
+// ─── Judge auth ─────────────────────────────────────────────────────────────
+
+app.get('/api/judge/list', (_req, res) => {
+  res.json(state.judges.map(j => ({ id: j.id, name: j.name })));
+});
+
+app.post('/api/judge/login', (req, res) => {
+  const { judgeId, password } = req.body;
+  if (!judgeId || !password) {
+    res.status(400).json({ error: 'judgeId and password required' });
+    return;
+  }
+  const judge = state.judges.find(j => j.id === judgeId);
+  if (!judge || judge.password !== password) {
+    res.status(401).json({ error: 'Invalid judge credentials' });
+    return;
+  }
+  res.json({ judgeId: judge.id, name: judge.name });
+});
+
 // ─── Admin auth ─────────────────────────────────────────────────────────────
 
 app.post('/api/admin/login', (req, res) => {
@@ -111,6 +205,50 @@ app.get('/api/admin/teams', requireAdmin, (_req, res) => {
       password: t.password,
     }))
   );
+});
+
+app.post('/api/admin/teams', requireAdmin, (req, res) => {
+  const { id, name, password, domain } = req.body;
+  if (!id || !name || !password) {
+    res.status(400).json({ error: 'id, name, and password required' });
+    return;
+  }
+  if (state.teams.some(t => t.id === id)) {
+    res.status(409).json({ error: 'Team id already exists' });
+    return;
+  }
+  const team = {
+    id: String(id).slice(0, 20),
+    name: String(name).slice(0, 50),
+    password: String(password).slice(0, 50),
+    domain: typeof domain === 'string' && domain.trim() ? domain.slice(0, 50) : 'General',
+    eliminated: false,
+    scores: makeEmptyScores(),
+  };
+  state.teams.push(team);
+  broadcastState();
+  res.json({ success: true, team: getPublicTeam(team) });
+});
+
+app.delete('/api/admin/team/:teamId', requireAdmin, (req, res) => {
+  const idx = state.teams.findIndex(t => t.id === req.params.teamId);
+  if (idx === -1) { res.status(404).json({ error: 'Team not found' }); return; }
+  const teamId = state.teams[idx].id;
+  state.battles = state.battles.filter(b => b.team1Id !== teamId && b.team2Id !== teamId);
+  if (state.activeBattleId) {
+    const active = state.battles.find(b => b.id === state.activeBattleId);
+    if (!active) state.activeBattleId = null;
+  }
+  delete state.warVotes[teamId];
+  for (const entry of Object.values(state.warVotes)) {
+    if (entry && entry.voteFor === teamId) entry.voteFor = null;
+  }
+  for (const roundVotes of Object.values(state.judgeVotes)) {
+    if (roundVotes && roundVotes[teamId]) delete roundVotes[teamId];
+  }
+  state.teams.splice(idx, 1);
+  broadcastState();
+  res.json({ success: true });
 });
 
 app.put('/api/admin/team/:teamId/name', requireAdmin, (req, res) => {
@@ -139,12 +277,22 @@ app.put('/api/admin/team/:teamId/eliminate', requireAdmin, (req, res) => {
 app.put('/api/admin/scores/:teamId/round1', requireAdmin, (req, res) => {
   const team = state.teams.find(t => t.id === req.params.teamId);
   if (!team) { res.status(404).json({ error: 'Team not found' }); return; }
-  const { insightAccuracy, taglineCreativity, audienceInsight, bonusTokens } = req.body;
+  const { insightAccuracy, taglineCreativity, audienceInsight, bonusTokens, judgeVotes } = req.body;
   const ia = Math.min(5, Math.max(0, Number(insightAccuracy) || 0));
   const tc = Math.min(5, Math.max(0, Number(taglineCreativity) || 0));
   const ai = Math.min(10, Math.max(0, Number(audienceInsight) || 0));
   const bt = [0, 10, 20].includes(Number(bonusTokens)) ? Number(bonusTokens) : 0;
-  team.scores.round1 = { insightAccuracy: ia, taglineCreativity: tc, audienceInsight: ai, bonusTokens: bt };
+  team.scores.round1 = {
+    insightAccuracy: ia,
+    taglineCreativity: tc,
+    audienceInsight: ai,
+    bonusTokens: bt,
+    judgeVotes: team.scores.round1.judgeVotes,
+  };
+  if (judgeVotes !== undefined) {
+    const points = Math.min(100, Math.max(0, Number(judgeVotes) || 0));
+    setJudgeVote(1, team.id, 'admin', points);
+  }
   broadcastState();
   res.json({ success: true, scores: team.scores.round1 });
 });
@@ -153,7 +301,12 @@ app.put('/api/admin/scores/:teamId/round2', requireAdmin, (req, res) => {
   const team = state.teams.find(t => t.id === req.params.teamId);
   if (!team) { res.status(404).json({ error: 'Team not found' }); return; }
   const remainingTokens = Math.max(0, Number(req.body.remainingTokens) || 0);
-  team.scores.round2 = { remainingTokens };
+  const judgeVotes = req.body.judgeVotes;
+  team.scores.round2 = { remainingTokens, judgeVotes: team.scores.round2.judgeVotes };
+  if (judgeVotes !== undefined) {
+    const points = Math.min(100, Math.max(0, Number(judgeVotes) || 0));
+    setJudgeVote(2, team.id, 'admin', points);
+  }
   broadcastState();
   res.json({ success: true, scores: team.scores.round2 });
 });
@@ -161,14 +314,19 @@ app.put('/api/admin/scores/:teamId/round2', requireAdmin, (req, res) => {
 app.put('/api/admin/scores/:teamId/round3', requireAdmin, (req, res) => {
   const team = state.teams.find(t => t.id === req.params.teamId);
   if (!team) { res.status(404).json({ error: 'Team not found' }); return; }
-  const { creativity, relevance, performance, clarity, engagement } = req.body;
+  const { creativity, relevance, performance, clarity, engagement, judgeVotes } = req.body;
   team.scores.round3 = {
     creativity: Math.min(5, Math.max(0, Number(creativity) || 0)),
     relevance: Math.min(5, Math.max(0, Number(relevance) || 0)),
     performance: Math.min(5, Math.max(0, Number(performance) || 0)),
     clarity: Math.min(5, Math.max(0, Number(clarity) || 0)),
     engagement: Math.min(5, Math.max(0, Number(engagement) || 0)),
+    judgeVotes: team.scores.round3.judgeVotes,
   };
+  if (judgeVotes !== undefined) {
+    const points = Math.min(100, Math.max(0, Number(judgeVotes) || 0));
+    setJudgeVote(3, team.id, 'admin', points);
+  }
   broadcastState();
   res.json({ success: true, scores: team.scores.round3 });
 });
@@ -190,14 +348,19 @@ app.put('/api/admin/scores/:teamId/round4', requireAdmin, (req, res) => {
 app.put('/api/admin/scores/:teamId/round5', requireAdmin, (req, res) => {
   const team = state.teams.find(t => t.id === req.params.teamId);
   if (!team) { res.status(404).json({ error: 'Team not found' }); return; }
-  const { insight, strategy, creativity, feasibility, delivery } = req.body;
+  const { insight, strategy, creativity, feasibility, delivery, judgeVotes } = req.body;
   team.scores.round5 = {
     insight: Math.min(10, Math.max(0, Number(insight) || 0)),
     strategy: Math.min(10, Math.max(0, Number(strategy) || 0)),
     creativity: Math.min(10, Math.max(0, Number(creativity) || 0)),
     feasibility: Math.min(10, Math.max(0, Number(feasibility) || 0)),
     delivery: Math.min(10, Math.max(0, Number(delivery) || 0)),
+    judgeVotes: team.scores.round5.judgeVotes,
   };
+  if (judgeVotes !== undefined) {
+    const points = Math.min(100, Math.max(0, Number(judgeVotes) || 0));
+    setJudgeVote(5, team.id, 'admin', points);
+  }
   broadcastState();
   res.json({ success: true, scores: team.scores.round5 });
 });
@@ -278,6 +441,10 @@ app.post('/api/admin/battles', requireAdmin, (req, res) => {
 });
 
 app.put('/api/admin/battles/:battleId/activate', requireAdmin, (req, res) => {
+  if (state.currentRound !== state.warRound) {
+    res.status(400).json({ error: 'Battles can only go live during the war round' });
+    return;
+  }
   const battle = state.battles.find(b => b.id === req.params.battleId);
   if (!battle) { res.status(404).json({ error: 'Battle not found' }); return; }
   for (const b of state.battles) {
@@ -285,7 +452,7 @@ app.put('/api/admin/battles/:battleId/activate', requireAdmin, (req, res) => {
   }
   battle.status = 'active';
   state.activeBattleId = battle.id;
-  state.votes = {};
+  state.warVotes = {};
   broadcastState();
   res.json({ success: true });
 });
@@ -302,7 +469,7 @@ app.put('/api/admin/battles/:battleId/complete', requireAdmin, (req, res) => {
 
   battle.status = 'completed';
   state.activeBattleId = null;
-  state.votes = {};
+  state.warVotes = {};
   broadcastState();
   res.json({
     success: true,
@@ -316,14 +483,31 @@ app.delete('/api/admin/battles/:battleId', requireAdmin, (req, res) => {
   if (idx === -1) { res.status(404).json({ error: 'Battle not found' }); return; }
   if (state.activeBattleId === state.battles[idx].id) {
     state.activeBattleId = null;
-    state.votes = {};
+    state.warVotes = {};
   }
   state.battles.splice(idx, 1);
   broadcastState();
   res.json({ success: true });
 });
 
-// ─── Team: Voting ───────────────────────────────────────────────────────────
+// ─── Team/Prime: War voting ─────────────────────────────────────────────────
+
+function ensureActiveWarBattle(res) {
+  if (state.currentRound !== state.warRound) {
+    res.status(400).json({ error: 'War voting only allowed during war round' });
+    return null;
+  }
+  if (!state.activeBattleId) {
+    res.status(400).json({ error: 'No active battle' });
+    return null;
+  }
+  const battle = state.battles.find(b => b.id === state.activeBattleId);
+  if (!battle) {
+    res.status(400).json({ error: 'Active battle not found' });
+    return null;
+  }
+  return battle;
+}
 
 app.post('/api/vote', (req, res) => {
   const { teamId, password, voteFor } = req.body;
@@ -336,15 +520,8 @@ app.post('/api/vote', (req, res) => {
     res.status(401).json({ error: 'Invalid credentials' });
     return;
   }
-  if (!state.activeBattleId) {
-    res.status(400).json({ error: 'No active battle' });
-    return;
-  }
-  const battle = state.battles.find(b => b.id === state.activeBattleId);
-  if (!battle) {
-    res.status(400).json({ error: 'Active battle not found' });
-    return;
-  }
+  const battle = ensureActiveWarBattle(res);
+  if (!battle) return;
   if (teamId === battle.team1Id || teamId === battle.team2Id) {
     res.status(403).json({ error: 'Battling teams cannot vote' });
     return;
@@ -353,15 +530,67 @@ app.post('/api/vote', (req, res) => {
     res.status(400).json({ error: 'Can only vote for a battling team' });
     return;
   }
-  state.votes[teamId] = voteFor;
+  state.warVotes[teamId] = { voteFor, weight: 1 };
   broadcastState();
   res.json({ success: true, votedFor: voteFor });
+});
+
+app.post('/api/prime/vote', (req, res) => {
+  const { primeId, password, voteFor } = req.body;
+  if (!primeId || !password || !voteFor) {
+    res.status(400).json({ error: 'primeId, password, and voteFor required' });
+    return;
+  }
+  const prime = state.primes.find(p => p.id === primeId);
+  if (!prime || prime.password !== password) {
+    res.status(401).json({ error: 'Invalid prime credentials' });
+    return;
+  }
+  const battle = ensureActiveWarBattle(res);
+  if (!battle) return;
+  if (voteFor !== battle.team1Id && voteFor !== battle.team2Id) {
+    res.status(400).json({ error: 'Can only vote for a battling team' });
+    return;
+  }
+  state.warVotes[primeId] = { voteFor, weight: 5 };
+  broadcastState();
+  res.json({ success: true, votedFor: voteFor });
+});
+
+// ─── Judge: Round voting ───────────────────────────────────────────────────
+
+app.post('/api/judge/vote', (req, res) => {
+  const { judgeId, password, teamId, round, points } = req.body;
+  if (!judgeId || !password || !teamId || !round) {
+    res.status(400).json({ error: 'judgeId, password, teamId, and round required' });
+    return;
+  }
+  const judge = state.judges.find(j => j.id === judgeId);
+  if (!judge || judge.password !== password) {
+    res.status(401).json({ error: 'Invalid judge credentials' });
+    return;
+  }
+  const team = state.teams.find(t => t.id === teamId);
+  if (!team) {
+    res.status(404).json({ error: 'Team not found' });
+    return;
+  }
+  const roundNum = Number(round);
+  if (roundNum < 1 || roundNum > 5 || roundNum === state.warRound) {
+    res.status(400).json({ error: 'Judges cannot vote during war round' });
+    return;
+  }
+  const score = Math.min(100, Math.max(0, Number(points) || 0));
+  setJudgeVote(roundNum, teamId, judgeId, score);
+  broadcastState();
+  res.json({ success: true, teamId, round: roundNum, points: score });
 });
 
 // ─── Admin: Reset state ─────────────────────────────────────────────────────
 
 app.post('/api/admin/reset', requireAdmin, (_req, res) => {
   state = createInitialState();
+  syncAllJudgeVotes();
   broadcastState();
   res.json({ success: true });
 });

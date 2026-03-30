@@ -5,9 +5,13 @@ import TeamLogin from './pages/TeamLogin';
 import TeamDashboard from './pages/TeamDashboard';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import PrimeLogin from './pages/PrimeLogin';
+import PrimeDashboard from './pages/PrimeDashboard';
+import JudgeLogin from './pages/JudgeLogin';
+import JudgeDashboard from './pages/JudgeDashboard';
 
 function AppRoutes() {
-  const { teamAuth, adminToken } = useAuth();
+  const { teamAuth, adminToken, primeAuth, judgeAuth } = useAuth();
 
   return (
     <Routes>
@@ -26,6 +30,22 @@ function AppRoutes() {
           adminToken
             ? <AdminDashboard />
             : <AdminLogin onLogin={() => {}} />
+        }
+      />
+      <Route
+        path="/prime"
+        element={
+          primeAuth
+            ? <PrimeDashboard />
+            : <PrimeLogin onLogin={() => {}} />
+        }
+      />
+      <Route
+        path="/judge"
+        element={
+          judgeAuth
+            ? <JudgeDashboard />
+            : <JudgeLogin onLogin={() => {}} />
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />

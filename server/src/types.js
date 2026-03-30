@@ -1,13 +1,13 @@
 export function calcRound1Total(s) {
-  return s.insightAccuracy + s.taglineCreativity + s.audienceInsight;
+  return s.insightAccuracy + s.taglineCreativity + s.audienceInsight + s.judgeVotes;
 }
 
 export function calcRound2Total(s) {
-  return Math.floor(s.remainingTokens / 20);
+  return Math.floor(s.remainingTokens / 20) + s.judgeVotes;
 }
 
 export function calcRound3Total(s) {
-  return s.creativity + s.relevance + s.performance + s.clarity + s.engagement;
+  return s.creativity + s.relevance + s.performance + s.clarity + s.engagement + s.judgeVotes;
 }
 
 export function calcRound4Total(s) {
@@ -15,7 +15,7 @@ export function calcRound4Total(s) {
 }
 
 export function calcRound5Total(s) {
-  return s.insight + s.strategy + s.creativity + s.feasibility + s.delivery;
+  return s.insight + s.strategy + s.creativity + s.feasibility + s.delivery + s.judgeVotes;
 }
 
 export function calcTotalScore(s) {

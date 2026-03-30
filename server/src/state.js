@@ -1,10 +1,10 @@
 function emptyScores() {
   return {
-    round1: { insightAccuracy: 0, taglineCreativity: 0, audienceInsight: 0, bonusTokens: 0 },
-    round2: { remainingTokens: 0 },
-    round3: { creativity: 0, relevance: 0, performance: 0, clarity: 0, engagement: 0 },
+    round1: { insightAccuracy: 0, taglineCreativity: 0, audienceInsight: 0, bonusTokens: 0, judgeVotes: 0 },
+    round2: { remainingTokens: 0, judgeVotes: 0 },
+    round3: { creativity: 0, relevance: 0, performance: 0, clarity: 0, engagement: 0, judgeVotes: 0 },
     round4: { strategy: 0, creativity: 0, impact: 0, audienceVotes: 0 },
-    round5: { insight: 0, strategy: 0, creativity: 0, feasibility: 0, delivery: 0 },
+    round5: { insight: 0, strategy: 0, creativity: 0, feasibility: 0, delivery: 0, judgeVotes: 0 },
   };
 }
 
@@ -30,14 +30,32 @@ const defaultTeams = [
   makeTeam('me4', 'Team ME-4', 'Fr1cK4', 'Media & Entertainment'),
 ];
 
+const defaultPrimes = [
+  { id: 'p1', name: 'Prime Member 1', password: 'Prime@01' },
+  { id: 'p2', name: 'Prime Member 2', password: 'Prime@02' },
+  { id: 'p3', name: 'Prime Member 3', password: 'Prime@03' },
+  { id: 'p4', name: 'Prime Member 4', password: 'Prime@04' },
+  { id: 'p5', name: 'Prime Member 5', password: 'Prime@05' },
+];
+
+const defaultJudges = [
+  { id: 'j1', name: 'Judge 1', password: 'Judge@01' },
+  { id: 'j2', name: 'Judge 2', password: 'Judge@02' },
+  { id: 'j3', name: 'Judge 3', password: 'Judge@03' },
+];
+
 export function createInitialState() {
   return {
     currentRound: 1,
+    warRound: 4,
     teams: defaultTeams.map(t => ({ ...t, scores: emptyScores() })),
+    primes: defaultPrimes.map(p => ({ ...p })),
+    judges: defaultJudges.map(j => ({ ...j })),
     timer: { endTime: null, running: false, label: '' },
     battles: [],
     activeBattleId: null,
-    votes: {},
+    warVotes: {},
+    judgeVotes: {},
   };
 }
 

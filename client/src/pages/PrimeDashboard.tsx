@@ -1,27 +1,27 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useGameState, useAuth } from '../hooks/useGameState';
 import { api } from '../socket';
 import Leaderboard from '../components/Leaderboard';
 import TimerDisplay from '../components/Timer';
 
-export default function TeamDashboard() {
+export default function PrimeDashboard() {
   const state = useGameState();
-  const { teamAuth, logoutTeam } = useAuth();
+  const { primeAuth, logoutPrime } = useAuth();
   const [voteLoading, setVoteLoading] = useState(false);
   const [voteError, setVoteError] = useState('');
   const [voteSuccess, setVoteSuccess] = useState('');
 
   const handleVote = useCallback(async (voteFor: string) => {
-    if (!teamAuth) return;
+    if (!primeAuth) return;
     setVoteLoading(true);
     setVoteError('');
     setVoteSuccess('');
     try {
-      await api('/api/vote', {
+      await api('/api/prime/vote', {
         method: 'POST',
         body: JSON.stringify({
-          teamId: teamAuth.teamId,
-          password: teamAuth.password,
+          primeId: primeAuth.primeId,
+          password: primeAuth.password,
           voteFor,
         }),
       });
@@ -32,9 +32,9 @@ export default function TeamDashboard() {
     } finally {
       setVoteLoading(false);
     }
-  }, [teamAuth, state]);
+  }, [primeAuth, state]);
 
-  if (!state || !teamAuth) {
+  if (!state || !primeAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[var(--blue-primary)] border-t-transparent rounded-full animate-spin" />
@@ -42,33 +42,25 @@ export default function TeamDashboard() {
     );
   }
 
-  const myTeam = state.teams.find(t => t.id === teamAuth.teamId);
+  const activeBattle = state.battles.find(b => b.id === state.activeBattleId);
   const isWarRound = state.currentRound === state.warRound;
-  const activeBattle = isWarRound ? state.battles.find(b => b.id === state.activeBattleId) : null;
-  const amBattling = activeBattle && (activeBattle.team1Id === teamAuth.teamId || activeBattle.team2Id === teamAuth.teamId);
   const team1 = activeBattle ? state.teams.find(t => t.id === activeBattle.team1Id) : null;
   const team2 = activeBattle ? state.teams.find(t => t.id === activeBattle.team2Id) : null;
 
   return (
     <div className="min-h-screen text-[var(--text-main)] pb-12">
-      {/* Header */}
       <header className="bg-white border-b-4 border-[var(--orange-primary)] shadow-sm sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-3 md:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h1 className="font-black text-xl md:text-2xl lg:text-3xl tracking-tight text-[var(--blue-primary)] uppercase truncate">{myTeam?.name || teamAuth.name}</h1>
+            <h1 className="font-black text-xl md:text-2xl lg:text-3xl tracking-tight text-[var(--blue-primary)] uppercase truncate">{primeAuth.name}</h1>
             <p className="font-hand text-sm md:text-base lg:text-lg text-gray-500 -mt-1 flex flex-wrap gap-2">
-              <span className="marker-highlight-mint px-1">{myTeam?.domain}</span> <span className="marker-highlight-peach px-1">Round {state.currentRound}</span>
+              <span className="marker-highlight-mint px-1">Prime Voting</span>
+              <span className="marker-highlight-peach px-1">Round {state.currentRound}</span>
             </p>
           </div>
           <div className="flex items-center gap-3 md:gap-6 flex-wrap">
-            {myTeam && (
-              <div className="text-right scrapbook-card rotate-3 !p-2 !px-3 md:!px-4 whitespace-nowrap">
-                <p className="font-hand font-bold text-gray-600 mb-[-4px] text-xs md:text-sm">Current Score</p>
-                <p className="font-black text-lg md:text-2xl text-[var(--orange-primary)]">{myTeam.totalScore}</p>
-              </div>
-            )}
             <button
-              onClick={logoutTeam}
+              onClick={logoutPrime}
               className="font-bold text-xs md:text-sm text-[var(--blue-primary)] hover:text-white hover:bg-[var(--blue-primary)] border-2 border-[var(--blue-primary)] transition-colors px-3 md:px-4 py-2 rounded-lg translate-y-[2px] shadow-[2px_2px_0_var(--blue-primary)] hover:shadow-[0_0_0_var(--blue-primary)] hover:translate-y-[4px] whitespace-nowrap"
             >
               Logout
@@ -78,7 +70,6 @@ export default function TeamDashboard() {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-6 md:py-8 space-y-8 md:space-y-10">
-        {/* Timer */}
         {state.timer.running && (
           <div className="flex justify-center my-4">
             <TimerDisplay
@@ -89,11 +80,10 @@ export default function TeamDashboard() {
           </div>
         )}
 
-        {/* Voting Section (Round 4) */}
-        {activeBattle && !amBattling && team1 && team2 && (
+        {isWarRound && activeBattle && team1 && team2 && (
           <div className="scrapbook-card tape-effect rotate-[-1deg] bg-[var(--peach-light)]">
             <h3 className="text-center font-hand text-2xl md:text-3xl font-bold text-red-600 mb-4 md:mb-6 transform -rotate-2 underline decoration-wavy">
-              ⚔️ Cast Your Vote! ⚔️
+              ★ Prime Vote (x5) ★
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6">
               <button
@@ -122,24 +112,6 @@ export default function TeamDashboard() {
               </button>
             </div>
 
-            {/* Vote bar */}
-            {(state.voteCounts[team1.id] || state.voteCounts[team2.id]) ? (
-              <div className="mt-6 h-4 rounded-full bg-white border-2 border-gray-800 overflow-hidden flex shadow-inner">
-                {(() => {
-                  const v1 = state.voteCounts[team1.id] || 0;
-                  const v2 = state.voteCounts[team2.id] || 0;
-                  const total = v1 + v2;
-                  if (total === 0) return null;
-                  return (
-                    <>
-                      <div className="bg-[var(--orange-primary)] transition-all duration-700 border-r-2 border-gray-800" style={{ width: `${(v1 / total) * 100}%` }} />
-                      <div className="bg-red-500 transition-all duration-700" style={{ width: `${(v2 / total) * 100}%` }} />
-                    </>
-                  );
-                })()}
-              </div>
-            ) : null}
-
             {voteError && (
               <p className="text-red-600 font-bold bg-white px-4 py-2 mt-4 text-center border-2 border-red-600 shadow-[4px_4px_0_#DC2626] transform rotate-1">{voteError}</p>
             )}
@@ -149,39 +121,13 @@ export default function TeamDashboard() {
           </div>
         )}
 
-        {activeBattle && amBattling && (
+        {!isWarRound && (
           <div className="scrapbook-card tape-effect rotate-1 bg-[var(--blue-light)] text-center p-6 md:p-8">
-            <p className="text-[var(--blue-primary)] font-black text-xl md:text-3xl uppercase tracking-wider mb-2">You are currently battling! 💥</p>
-            <p className="text-gray-700 font-hand text-lg md:text-2xl">Show them what you've got in Brand Wars!</p>
+            <p className="text-[var(--blue-primary)] font-black text-xl md:text-3xl uppercase tracking-wider mb-2">Prime Voting is closed</p>
+            <p className="text-gray-700 font-hand text-lg md:text-2xl">Wait for the war round to cast your vote.</p>
           </div>
         )}
 
-        {!activeBattle && !amBattling && !isWarRound && (
-          <div className="scrapbook-card tape-effect rotate-1 bg-[var(--blue-light)] text-center p-6 md:p-8">
-            <p className="text-[var(--blue-primary)] font-black text-xl md:text-3xl uppercase tracking-wider mb-2">War voting is closed</p>
-            <p className="text-gray-700 font-hand text-lg md:text-2xl">Wait for the war round to vote.</p>
-          </div>
-        )}
-
-        {/* My Scores */}
-        {myTeam && (
-          <div className="scrapbook-card tape-effect p-4 md:p-6">
-            <h3 className="font-hand text-lg md:text-xl font-bold tracking-wider text-gray-500 mb-4 uppercase underline decoration-gray-300">Your Round Summary</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-4">
-              {[1, 2, 3, 4, 5].map(r => {
-                const key = `round${r}` as keyof typeof myTeam.roundScores;
-                return (
-                  <div key={r} className={`p-2 md:p-4 text-center border-2 border-[var(--text-main)] shadow-[2px_2px_0_var(--text-main)] transition-transform hover:-translate-y-1 text-xs md:text-base ${r <= state.currentRound ? 'bg-[var(--mint-light)]' : 'bg-white opacity-50'}`}>
-                    <p className="font-bold uppercase text-[var(--text-main)] text-[10px] md:text-sm mb-1">Round {r}</p>
-                    <p className="font-hand font-black text-xl md:text-3xl text-[var(--orange-primary)]">{myTeam.roundScores[key]}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Leaderboard */}
         <div className="scrapbook-card !p-0 overflow-hidden relative border-t-[12px] border-t-[var(--blue-primary)] border-x-2 border-b-2">
           <div className="px-6 py-4 border-b-2 border-dashed border-gray-200 bg-[var(--paper-bg)]">
             <h2 className="font-extrabold text-xl tracking-tight uppercase text-[var(--text-main)]">Agency Leaderboard</h2>
