@@ -6,10 +6,10 @@ import TeamLogin from './pages/TeamLogin';
 import TeamDashboard from './pages/TeamDashboard';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
-import PrimeLogin from './pages/PrimeLogin';
-import PrimeDashboard from './pages/PrimeDashboard';
-import JudgeLogin from './pages/JudgeLogin';
-import JudgeDashboard from './pages/JudgeDashboard';
+import PrimeLogin from './pages/PrimeLogin.tsx';
+import PrimeDashboard from './pages/PrimeDashboard.tsx';
+import JudgeLogin from './pages/JudgeLogin.tsx';
+import JudgeDashboard from './pages/JudgeDashboard.tsx';
 import { ROUTES } from './navigation';
 
 function AppRoutes() {

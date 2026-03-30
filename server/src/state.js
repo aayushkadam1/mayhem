@@ -48,6 +48,7 @@ export function createInitialState() {
   return {
     currentRound: 1,
     warRound: 4,
+    judgeVotingRound: null,
     teams: defaultTeams.map(t => ({ ...t, scores: emptyScores() })),
     primes: defaultPrimes.map(p => ({ ...p })),
     judges: defaultJudges.map(j => ({ ...j })),

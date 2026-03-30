@@ -26,33 +26,33 @@ export function useGameState(): PublicState | null {
 }
 
 export function useTimer(endTime: number | null, running: boolean) {
-  const [remaining, setRemaining] = useState(0);
+  const [remaining, setRemaining] = useState(() => {
+    if (!running || !endTime) return 0;
+    return Math.max(0, endTime - Date.now());
+  });
 
   useEffect(() => {
-    if (!running || !endTime) {
-      setRemaining(0);
-      return;
-    }
-
-    const tick = () => {
-      const diff = endTime - Date.now();
-      setRemaining(Math.max(0, diff));
-    };
-
-    tick();
-    const interval = setInterval(tick, 100);
+    if (!running || !endTime) return;
+    const interval = setInterval(() => {
+      setRemaining(Math.max(0, endTime - Date.now()));
+    }, 100);
     return () => clearInterval(interval);
   }, [endTime, running]);
 
-  const minutes = Math.floor(remaining / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
+  const effectiveRemaining = running && endTime ? remaining : 0;
 
-  return { remaining, minutes, seconds, isRunning: running && remaining > 0 };
+  const minutes = Math.floor(effectiveRemaining / 60000);
+  const seconds = Math.floor((effectiveRemaining % 60000) / 1000);
+
+  return { remaining: effectiveRemaining, minutes, seconds, isRunning: running && effectiveRemaining > 0 };
 }
 
 export function useTimerEnded(callback: () => void) {
   const callbackRef = useRef(callback);
-  callbackRef.current = callback;
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     const socket = getSocket();

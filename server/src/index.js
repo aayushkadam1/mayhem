@@ -19,6 +19,7 @@ app.use(express.json());
 const persistence = await initPersistence();
 let state = await loadState(createInitialState, persistence);
 if (!state.warRound) state.warRound = 4;
+if (state.judgeVotingRound === undefined) state.judgeVotingRound = null;
 if (!state.warVotes) state.warVotes = {};
 if (!state.judgeVotes) state.judgeVotes = {};
 if (!state.primes) state.primes = [];
@@ -26,20 +27,33 @@ if (!state.judges) state.judges = [];
 syncAllJudgeVotes();
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-function getPublicTeam(t) {
+function getPublicTeam(t, ctx) {
+  const effectiveScores = (() => {
+    if (!ctx.warVotingLive || !ctx.activeBattle) return t.scores;
+    if (t.id !== ctx.activeBattle.team1Id && t.id !== ctx.activeBattle.team2Id) return t.scores;
+    const liveVotes = ctx.voteCounts[t.id] || 0;
+    return {
+      ...t.scores,
+      round4: {
+        ...t.scores.round4,
+        audienceVotes: liveVotes,
+      },
+    };
+  })();
+
   return {
     id: t.id,
     name: t.name,
     domain: t.domain,
     eliminated: t.eliminated,
-    scores: t.scores,
-    totalScore: calcTotalScore(t.scores),
+    scores: effectiveScores,
+    totalScore: calcTotalScore(effectiveScores),
     roundScores: {
-      round1: calcRoundTotal(t.scores, 1),
-      round2: calcRoundTotal(t.scores, 2),
-      round3: calcRoundTotal(t.scores, 3),
-      round4: calcRoundTotal(t.scores, 4),
-      round5: calcRoundTotal(t.scores, 5),
+      round1: calcRoundTotal(effectiveScores, 1),
+      round2: calcRoundTotal(effectiveScores, 2),
+      round3: calcRoundTotal(effectiveScores, 3),
+      round4: calcRoundTotal(effectiveScores, 4),
+      round5: calcRoundTotal(effectiveScores, 5),
     },
   };
 }
@@ -84,14 +98,19 @@ function syncAllJudgeVotes() {
 }
 
 function getPublicState() {
+  const voteCounts = getVoteCounts();
+  const activeBattle = state.activeBattleId ? state.battles.find(b => b.id === state.activeBattleId) : null;
+  const warVotingLive = state.currentRound === state.warRound && !!activeBattle && activeBattle.status === 'active';
+
   return {
     currentRound: state.currentRound,
     warRound: state.warRound,
-    teams: state.teams.map(getPublicTeam),
+    judgeVotingRound: state.judgeVotingRound,
+    teams: state.teams.map(t => getPublicTeam(t, { voteCounts, activeBattle, warVotingLive })),
     timer: state.timer,
     battles: state.battles,
     activeBattleId: state.activeBattleId,
-    voteCounts: getVoteCounts(),
+    voteCounts,
   };
 }
 
@@ -373,9 +392,39 @@ app.put('/api/admin/round', requireAdmin, (req, res) => {
     res.status(400).json({ error: 'Round must be 1-5' });
     return;
   }
+  const prevRound = state.currentRound;
   state.currentRound = round;
+  state.judgeVotingRound = null;
+
+  // If we leave the war round, stop war voting.
+  if (prevRound === state.warRound && round !== state.warRound) {
+    if (state.activeBattleId) {
+      const battle = state.battles.find(b => b.id === state.activeBattleId);
+      if (battle && battle.status === 'active') battle.status = 'pending';
+    }
+    state.activeBattleId = null;
+    state.warVotes = {};
+  }
   broadcastState();
   res.json({ success: true, currentRound: round });
+});
+
+// ─── Admin: Judge voting window ────────────────────────────────────────────
+
+app.post('/api/admin/judgeVoting/open', requireAdmin, (_req, res) => {
+  if (state.currentRound === state.warRound) {
+    res.status(400).json({ error: 'Judge voting cannot be opened during war round' });
+    return;
+  }
+  state.judgeVotingRound = state.currentRound;
+  broadcastState();
+  res.json({ success: true, judgeVotingRound: state.judgeVotingRound });
+});
+
+app.post('/api/admin/judgeVoting/close', requireAdmin, (_req, res) => {
+  state.judgeVotingRound = null;
+  broadcastState();
+  res.json({ success: true, judgeVotingRound: state.judgeVotingRound });
 });
 
 // ─── Admin: Timer ───────────────────────────────────────────────────────────
@@ -576,8 +625,20 @@ app.post('/api/judge/vote', (req, res) => {
     return;
   }
   const roundNum = Number(round);
-  if (roundNum < 1 || roundNum > 5 || roundNum === state.warRound) {
+  if (roundNum < 1 || roundNum > 5) {
+    res.status(400).json({ error: 'Round must be 1-5' });
+    return;
+  }
+  if (state.currentRound === state.warRound || roundNum === state.warRound) {
     res.status(400).json({ error: 'Judges cannot vote during war round' });
+    return;
+  }
+  if (roundNum !== state.currentRound) {
+    res.status(400).json({ error: 'Judges can only vote for the current round' });
+    return;
+  }
+  if (state.judgeVotingRound !== roundNum) {
+    res.status(400).json({ error: 'Voting is not open yet for this round (ask admin to start voting)' });
     return;
   }
   const score = Math.min(100, Math.max(0, Number(points) || 0));

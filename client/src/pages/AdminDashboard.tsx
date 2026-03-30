@@ -84,12 +84,41 @@ function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<type
   const [newTeam, setNewTeam] = useState({ id: '', name: '', password: '', domain: '' });
   const [addError, setAddError] = useState('');
   const [adding, setAdding] = useState(false);
+  const [judgeVotingError, setJudgeVotingError] = useState('');
+  const [judgeVotingLoading, setJudgeVotingLoading] = useState(false);
+
+  const isWarRound = state.currentRound === state.warRound;
+  const isJudgeVotingOpen = !isWarRound && state.judgeVotingRound === state.currentRound;
 
   const changeRound = async () => {
     await adminApi('/api/admin/round', adminToken, {
       method: 'PUT',
       body: JSON.stringify({ round }),
     });
+  };
+
+  const openJudgeVoting = async () => {
+    setJudgeVotingError('');
+    setJudgeVotingLoading(true);
+    try {
+      await adminApi('/api/admin/judgeVoting/open', adminToken, { method: 'POST' });
+    } catch (err: unknown) {
+      setJudgeVotingError(err instanceof Error ? err.message : 'Failed to open judge voting');
+    } finally {
+      setJudgeVotingLoading(false);
+    }
+  };
+
+  const closeJudgeVoting = async () => {
+    setJudgeVotingError('');
+    setJudgeVotingLoading(true);
+    try {
+      await adminApi('/api/admin/judgeVoting/close', adminToken, { method: 'POST' });
+    } catch (err: unknown) {
+      setJudgeVotingError(err instanceof Error ? err.message : 'Failed to close judge voting');
+    } finally {
+      setJudgeVotingLoading(false);
+    }
   };
 
   const addTeam = async () => {
@@ -131,6 +160,43 @@ function OverviewTab({ state, adminToken }: { state: NonNullable<ReturnType<type
           >
             Set Round
           </button>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="text-xs text-gray-500">
+            Judge voting:{' '}
+            <span className={
+              isWarRound
+                ? 'text-gray-400 font-bold'
+                : isJudgeVotingOpen
+                  ? 'text-emerald-500 font-bold'
+                  : 'text-gray-400 font-bold'
+            }>
+              {isWarRound ? 'DISABLED (WAR ROUND)' : isJudgeVotingOpen ? 'OPEN' : 'CLOSED'}
+            </span>
+          </div>
+
+          {!isWarRound && (
+            isJudgeVotingOpen ? (
+              <button
+                onClick={closeJudgeVoting}
+                disabled={judgeVotingLoading}
+                className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors disabled:opacity-40"
+              >
+                {judgeVotingLoading ? 'Closing...' : 'Close Voting'}
+              </button>
+            ) : (
+              <button
+                onClick={openJudgeVoting}
+                disabled={judgeVotingLoading}
+                className="bg-emerald-500/20 text-emerald-500 px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-500/30 transition-colors disabled:opacity-40"
+              >
+                {judgeVotingLoading ? 'Starting...' : 'Start Voting'}
+              </button>
+            )
+          )}
+
+          {judgeVotingError && <span className="text-red-500 text-xs font-bold">{judgeVotingError}</span>}
         </div>
       </div>
 

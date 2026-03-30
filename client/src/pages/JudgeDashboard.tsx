@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGameState, useAuth } from '../hooks/useGameState';
 import { api } from '../socket';
@@ -10,13 +10,10 @@ export default function JudgeDashboard() {
   const state = useGameState();
   const { judgeAuth, logoutJudge } = useAuth();
   const [teamId, setTeamId] = useState('');
-  const [round, setRound] = useState(1);
   const [points, setPoints] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const rounds = useMemo(() => [1, 2, 3, 5], []);
 
   if (!state || !judgeAuth) {
     return (
@@ -26,11 +23,12 @@ export default function JudgeDashboard() {
     );
   }
 
-  const isWarRound = state.currentRound === state.warRound;
-  const selectableRounds = rounds.filter(r => r !== state.warRound);
+  const round = state.currentRound;
+  const isWarRound = round === state.warRound;
+  const votingOpen = !isWarRound && state.judgeVotingRound === round;
 
   const submitVote = async () => {
-    if (!teamId) return;
+    if (!teamId || !votingOpen) return;
     setError('');
     setSuccess('');
     setLoading(true);
@@ -46,7 +44,7 @@ export default function JudgeDashboard() {
         }),
       });
       const team = state.teams.find(t => t.id === teamId);
-      setSuccess(`Scored ${team?.name || teamId} with ${points} points.`);
+      setSuccess(`Scored ${team?.name || teamId} with ${points} points for Round ${round}.`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Vote failed');
     } finally {
@@ -95,15 +93,9 @@ export default function JudgeDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">Round</label>
-              <select
-                value={round}
-                onChange={e => setRound(Number(e.target.value))}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-orange-500/50"
-              >
-                {selectableRounds.map(r => (
-                  <option key={r} value={r} className="bg-white">Round {r}</option>
-                ))}
-              </select>
+              <div className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-[var(--text-main)] text-sm">
+                Round {round}
+              </div>
             </div>
             <div>
               <label className="block text-xs font-bold tracking-[0.15em] uppercase text-gray-600 mb-1">Team</label>
@@ -135,9 +127,13 @@ export default function JudgeDashboard() {
             <div className="text-xs text-red-500 font-bold">Judges cannot vote during the war round.</div>
           )}
 
+          {!isWarRound && !votingOpen && (
+            <div className="text-xs text-gray-500 font-bold">Voting is closed. Waiting for admin to start voting for Round {round}.</div>
+          )}
+
           <button
             onClick={submitVote}
-            disabled={!teamId || loading || round === state.warRound}
+            disabled={!teamId || loading || !votingOpen}
             className="bg-orange-500/20 text-orange-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition-colors disabled:opacity-40"
           >
             {loading ? 'Submitting...' : 'Submit Score'}

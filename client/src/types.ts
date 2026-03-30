@@ -90,6 +90,7 @@ export interface TimerState {
 export interface PublicState {
   currentRound: number;
   warRound: number;
+  judgeVotingRound: number | null;
   teams: PublicTeam[];
   timer: TimerState;
   battles: Battle[];
