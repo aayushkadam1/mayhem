@@ -5,9 +5,14 @@ import { MongoClient } from 'mongodb';
 const STATE_DOC_ID = 'game_state';
 
 export async function initPersistence() {
-  const dataDir = path.resolve(process.cwd(), 'data');
-  await fs.mkdir(dataDir, { recursive: true });
-  const stateFilePath = path.join(dataDir, 'localState.json');
+  let stateFilePath = null;
+  try {
+    const dataDir = path.resolve(process.cwd(), 'data');
+    await fs.mkdir(dataDir, { recursive: true });
+    stateFilePath = path.join(dataDir, 'localState.json');
+  } catch {
+    console.warn('Could not create data directory (read-only filesystem). Local file persistence disabled.');
+  }
 
   const uri = process.env.MONGODB_URI;
   const dbName = process.env.MONGODB_DB || 'mayhem';
@@ -45,7 +50,7 @@ export async function loadState(createInitialState, persistence) {
     }
   }
 
-  if (!state) {
+  if (!state && stateFilePath) {
     try {
       const raw = await fs.readFile(stateFilePath, 'utf-8');
       state = JSON.parse(raw);
@@ -60,8 +65,15 @@ export async function loadState(createInitialState, persistence) {
 
 export async function saveState(state, persistence) {
   const { collection, stateFilePath } = persistence;
-  const payload = JSON.stringify(state, null, 2);
-  await fs.writeFile(stateFilePath, payload);
+
+  if (stateFilePath) {
+    try {
+      const payload = JSON.stringify(state, null, 2);
+      await fs.writeFile(stateFilePath, payload);
+    } catch {
+      // Silently skip — local file is a backup; MongoDB is primary in production
+    }
+  }
 
   if (collection) {
     await collection.updateOne(
