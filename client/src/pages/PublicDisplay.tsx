@@ -3,6 +3,8 @@ import Leaderboard from '../components/Leaderboard';
 import TimerDisplay from '../components/Timer';
 import { ROUND_NAMES } from '../types';
 import { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../navigation';
 
 export default function PublicDisplay() {
   const state = useGameState();
@@ -44,6 +46,12 @@ export default function PublicDisplay() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-6 flex-wrap justify-end">
+            <Link
+              to={ROUTES.landing}
+              className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-2 border border-gray-200 rounded-lg whitespace-nowrap"
+            >
+              Landing
+            </Link>
             <div className="text-right scrapbook-card rotate-[-2deg] !p-2 md:!px-4 whitespace-nowrap">
               <p className="font-hand text-xs md:text-base text-gray-500 mb-[-4px]">Current Event Stage</p>
               <p className="font-bold text-xs md:text-base text-[var(--orange-primary)] uppercase tracking-wide">

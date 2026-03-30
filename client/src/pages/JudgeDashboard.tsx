@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useGameState, useAuth } from '../hooks/useGameState';
 import { api } from '../socket';
 import Leaderboard from '../components/Leaderboard';
 import TimerDisplay from '../components/Timer';
+import { ROUTES } from '../navigation';
 
 export default function JudgeDashboard() {
   const state = useGameState();
@@ -65,6 +67,12 @@ export default function JudgeDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-400">Round {state.currentRound}</span>
+            <Link
+              to={ROUTES.landing}
+              className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg"
+            >
+              Landing
+            </Link>
             <button onClick={logoutJudge} className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg">
               Logout
             </button>

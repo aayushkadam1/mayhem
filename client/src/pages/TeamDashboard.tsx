@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useGameState, useAuth } from '../hooks/useGameState';
 import { api } from '../socket';
 import Leaderboard from '../components/Leaderboard';
 import TimerDisplay from '../components/Timer';
+import { ROUTES } from '../navigation';
 
 export default function TeamDashboard() {
   const state = useGameState();
@@ -67,6 +69,12 @@ export default function TeamDashboard() {
                 <p className="font-black text-lg md:text-2xl text-[var(--orange-primary)]">{myTeam.totalScore}</p>
               </div>
             )}
+            <Link
+              to={ROUTES.landing}
+              className="font-bold text-xs md:text-sm text-gray-500 hover:text-[var(--blue-primary)] border-2 border-gray-300 transition-colors px-3 md:px-4 py-2 rounded-lg translate-y-[2px] whitespace-nowrap"
+            >
+              Back to Landing
+            </Link>
             <button
               onClick={logoutTeam}
               className="font-bold text-xs md:text-sm text-[var(--blue-primary)] hover:text-white hover:bg-[var(--blue-primary)] border-2 border-[var(--blue-primary)] transition-colors px-3 md:px-4 py-2 rounded-lg translate-y-[2px] shadow-[2px_2px_0_var(--blue-primary)] hover:shadow-[0_0_0_var(--blue-primary)] hover:translate-y-[4px] whitespace-nowrap"

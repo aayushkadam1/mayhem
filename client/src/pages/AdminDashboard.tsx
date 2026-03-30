@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useGameState, useAuth } from '../hooks/useGameState';
 import { adminApi } from '../socket';
 import Leaderboard from '../components/Leaderboard';
 import TimerDisplay from '../components/Timer';
 import { ROUND_NAMES } from '../types';
 import type { PublicTeam } from '../types';
+import { ROUTES } from '../navigation';
 
 type Tab = 'overview' | 'scoring' | 'timer' | 'battles';
 
@@ -35,6 +37,12 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-400">Round {state.currentRound}</span>
+            <Link
+              to={ROUTES.landing}
+              className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg"
+            >
+              Landing
+            </Link>
             <button onClick={logoutAdmin} className="text-xs text-gray-400 hover:text-[var(--text-main)]/60 px-3 py-1.5 border border-gray-200 rounded-lg">
               Logout
             </button>
