@@ -107,6 +107,23 @@ export default function AdminDashboard() {
   const state = useGameState();
   const { adminToken, logoutAdmin } = useAuth();
   const [tab, setTab] = useState<Tab>('overview');
+  const [resetConfirm, setResetConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  const handleReset = async () => {
+    if (!resetConfirm) {
+      setResetConfirm(true);
+      setTimeout(() => setResetConfirm(false), 5000);
+      return;
+    }
+    setResetting(true);
+    try {
+      await adminApi('/api/admin/reset', adminToken!, { method: 'POST' });
+    } finally {
+      setResetting(false);
+      setResetConfirm(false);
+    }
+  };
 
   if (!state || !adminToken) {
     return (
@@ -134,6 +151,17 @@ export default function AdminDashboard() {
             <Link to={ROUTES.landing} className="mm-btn-secondary text-xs">
               Back
             </Link>
+            <button
+              onClick={handleReset}
+              disabled={resetting}
+              className={`text-xs transition-all duration-200 mm-btn ${
+                resetConfirm
+                  ? 'border-red-500/60 bg-red-500/20 text-red-300 hover:bg-red-500/30 animate-pulse'
+                  : 'border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 focus:ring-red-500/20'
+              }`}
+            >
+              {resetting ? 'Resetting…' : resetConfirm ? 'Tap again to confirm reset' : 'Reset Event'}
+            </button>
             <button onClick={logoutAdmin} className="mm-btn-primary text-xs">
               Logout
             </button>
