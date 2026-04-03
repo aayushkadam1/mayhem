@@ -1,0 +1,19 @@
+--- ../server/src/types.js
++++ ../server/src/types.js
+@@ -3,7 +3,7 @@
+ }
+ 
+ export function calcRound2Total(s) {
+-  return Math.floor(s.remainingTokens / 20) + s.judgeVotes;
++  return s.judgeVotes;
+ }
+ 
+ export function calcRound3Total(s) {
+@@ -20,7 +20,6 @@
+ export function calcTotalScore(s) {
+   return (
+     calcRound1Total(s.round1) +
+-    calcRound2Total(s.round2) +
+     calcRound3Total(s.round3) +
+     calcRound4Total(s.round4) +
+     calcRound5Total(s.round5)

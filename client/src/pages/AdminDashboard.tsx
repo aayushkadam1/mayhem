@@ -604,14 +604,14 @@ function Round2Form({ team, adminToken }: { team: PublicTeam; adminToken: string
       </div>
       <div>
         <label className="mm-label">Remaining Tokens After Spending</label>
-        <p className="text-xs text-white/30 mb-2">20 tokens = 1 point on leaderboard</p>
+        <p className="text-xs text-white/30 mb-2">Shown for reference only (not added to total points)</p>
         <input type="number" min={0} value={remainingTokens} onChange={e => setRemainingTokens(Math.max(0, Number(e.target.value) || 0))} className="mm-input font-mono" />
       </div>
       <div>
         <label className="mm-label">Judge Votes <span className="text-white/30">(no multiplier)</span></label>
         <input type="number" min={0} max={100} value={judgeVotes} onChange={e => setJudgeVotes(Math.min(100, Math.max(0, Number(e.target.value) || 0)))} className="mm-input font-mono" />
       </div>
-      <SaveButton onClick={save} saved={saved} total={Math.floor(remainingTokens / 20) + judgeVotes} />
+      <SaveButton onClick={save} saved={saved} total={judgeVotes} />
     </div>
   );
 }

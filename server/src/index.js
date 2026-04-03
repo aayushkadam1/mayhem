@@ -267,7 +267,8 @@ app.post('/api/admin/teams', requireAdmin, (req, res) => {
   };
   state.teams.push(team);
   broadcastState();
-  res.json({ success: true, team: getPublicTeam(team) });
+  const ctx = getScoringContext();
+  res.json({ success: true, team: getPublicTeam(team, ctx) });
 });
 
 app.delete('/api/admin/team/:teamId', requireAdmin, (req, res) => {
@@ -670,7 +671,18 @@ app.post('/api/judge/vote', (req, res) => {
     res.status(400).json({ error: 'Voting is not open yet for this round (ask admin to start voting)' });
     return;
   }
-  const score = Math.min(100, Math.max(0, Number(points) || 0));
+
+  if ([1, 3, 5].includes(roundNum)) {
+    const existingVotes = state.judgeVotes[roundNum]?.[teamId] || {};
+    const otherJudgeIds = Object.keys(existingVotes).filter(k => k !== 'admin' && k !== judgeId);
+    if (otherJudgeIds.length > 0) {
+      res.status(400).json({ error: `Another judge has already voted for this team in Round ${roundNum}.` });
+      return;
+    }
+  }
+
+  const maxPoints = roundNum === 1 ? 20 : (roundNum === 3 ? 25 : (roundNum === 2 ? 10000 : 100));
+  const score = Math.min(maxPoints, Math.max(0, Number(points) || 0));
   setJudgeVote(roundNum, teamId, judgeId, score);
   broadcastState();
   res.json({ success: true, teamId, round: roundNum, points: score });

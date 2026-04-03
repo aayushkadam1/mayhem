@@ -13,35 +13,35 @@ function makeTeam(id, name, password, domain) {
 }
 
 const defaultTeams = [
-  // Food & Beverages (4 teams)
-  makeTeam('fb1', 'Team FB-1', 'Kx7mP2', 'Food & Beverages'),
-  makeTeam('fb2', 'Team FB-2', 'Qr9fN3', 'Food & Beverages'),
-  makeTeam('fb3', 'Team FB-3', 'Wz5gT8', 'Food & Beverages'),
-  makeTeam('fb4', 'Team FB-4', 'Hb6jY4', 'Food & Beverages'),
-  // Clothing & Apparels (4 teams)
-  makeTeam('ca1', 'Team CA-1', 'Lp3nV7', 'Clothing & Apparels'),
-  makeTeam('ca2', 'Team CA-2', 'Sd8kM1', 'Clothing & Apparels'),
-  makeTeam('ca3', 'Team CA-3', 'Vf2rX9', 'Clothing & Apparels'),
-  makeTeam('ca4', 'Team CA-4', 'Tc6yW5', 'Clothing & Apparels'),
-  // Media & Entertainment (4 teams)
-  makeTeam('me1', 'Team ME-1', 'Jn4bQ8', 'Media & Entertainment'),
-  makeTeam('me2', 'Team ME-2', 'Xg7dH3', 'Media & Entertainment'),
-  makeTeam('me3', 'Team ME-3', 'Mw9zS6', 'Media & Entertainment'),
-  makeTeam('me4', 'Team ME-4', 'Fr1cK4', 'Media & Entertainment'),
+  // Food & Beverages
+  makeTeam('fb1', 'Casekings', 'Kx7mP2', 'Food & Beverages'),
+  makeTeam('fb2', 'Team diamond', 'Qr9fN3', 'Food & Beverages'),
+  makeTeam('fb3', 'Reasoned Judgement', 'Wz5gT8', 'Food & Beverages'),
+  makeTeam('fb4', 'Mavericks', 'Hb6jY4', 'Food & Beverages'),
+  // Clothing & Apparels
+  makeTeam('ca1', 'Men in sales', 'Lp3nV7', 'Clothing & Apparels'),
+  makeTeam('ca2', '3 brain cells', 'Sd8kM1', 'Clothing & Apparels'),
+  // Media & Entertainment
+  makeTeam('me1', 'Paneer Biryani', 'Jn4bQ8', 'Media & Entertainment'),
+  makeTeam('me2', 'Impact 3', 'Xg7dH3', 'Media & Entertainment'),
+  makeTeam('me3', 'Team esctasy', 'Mw9zS6', 'Media & Entertainment'),
+  makeTeam('me4', 'fantastic3', 'Fr1cK4', 'Media & Entertainment'),
 ];
 
 const defaultPrimes = [
-  { id: 'p1', name: 'Prime Member 1', password: 'Prime@01' },
-  { id: 'p2', name: 'Prime Member 2', password: 'Prime@02' },
-  { id: 'p3', name: 'Prime Member 3', password: 'Prime@03' },
-  { id: 'p4', name: 'Prime Member 4', password: 'Prime@04' },
-  { id: 'p5', name: 'Prime Member 5', password: 'Prime@05' },
+  { id: 'p1', name: 'Prime Member 1', password: 'Prm1#2026' },
+  { id: 'p2', name: 'Prime Member 2', password: 'Prm2#2026' },
+  { id: 'p3', name: 'Prime Member 3', password: 'Prm3#2026' },
+  { id: 'p4', name: 'Prime Member 4', password: 'Prm4#2026' },
+  { id: 'p5', name: 'Prime Member 5', password: 'Prm5#2026' },
 ];
 
 const defaultJudges = [
-  { id: 'j1', name: 'Judge 1', password: 'Judge@01' },
-  { id: 'j2', name: 'Judge 2', password: 'Judge@02' },
-  { id: 'j3', name: 'Judge 3', password: 'Judge@03' },
+  { id: 'j1', name: 'Judge 1', password: 'Jdg1$Mayhem' },
+  { id: 'j2', name: 'Judge 2', password: 'Jdg2$Mayhem' },
+  { id: 'j3', name: 'Judge 3', password: 'Jdg3$Mayhem' },
+  { id: 'j4', name: 'Judge 4', password: 'Jdg4$Mayhem' },
+  { id: 'j5', name: 'Judge 5', password: 'Jdg5$Mayhem' },
 ];
 
 export function createInitialState() {

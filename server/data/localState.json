@@ -1,10 +1,11 @@
 {
-  "currentRound": 2,
+  "currentRound": 1,
   "warRound": 4,
+  "judgeVotingRound": null,
   "teams": [
     {
       "id": "fb1",
-      "name": "Team FB-1",
+      "name": "Casekings",
       "password": "Kx7mP2",
       "domain": "Food & Beverages",
       "eliminated": false,
@@ -21,18 +22,18 @@
           "judgeVotes": 0
         },
         "round3": {
-          "creativity": 0,
-          "relevance": 0,
-          "performance": 0,
-          "clarity": 0,
-          "engagement": 0,
+          "creativity": 5,
+          "relevance": 5,
+          "performance": 5,
+          "clarity": 5,
+          "engagement": 5,
           "judgeVotes": 0
         },
         "round4": {
           "strategy": 0,
           "creativity": 0,
           "impact": 0,
-          "audienceVotes": 1
+          "audienceVotes": 0
         },
         "round5": {
           "insight": 0,
@@ -46,7 +47,7 @@
     },
     {
       "id": "fb2",
-      "name": "Team FB-2",
+      "name": "Team diamond",
       "password": "Qr9fN3",
       "domain": "Food & Beverages",
       "eliminated": false,
@@ -60,7 +61,7 @@
         },
         "round2": {
           "remainingTokens": 0,
-          "judgeVotes": 19
+          "judgeVotes": 0
         },
         "round3": {
           "creativity": 0,
@@ -74,7 +75,7 @@
           "strategy": 0,
           "creativity": 0,
           "impact": 0,
-          "audienceVotes": 5
+          "audienceVotes": 0
         },
         "round5": {
           "insight": 0,
@@ -88,7 +89,7 @@
     },
     {
       "id": "fb3",
-      "name": "Team FB-3",
+      "name": "Reasoned Judgement",
       "password": "Wz5gT8",
       "domain": "Food & Beverages",
       "eliminated": false,
@@ -116,7 +117,7 @@
           "strategy": 0,
           "creativity": 0,
           "impact": 0,
-          "audienceVotes": 1
+          "audienceVotes": 0
         },
         "round5": {
           "insight": 0,
@@ -130,7 +131,7 @@
     },
     {
       "id": "fb4",
-      "name": "Team FB-4",
+      "name": "Mavericks",
       "password": "Hb6jY4",
       "domain": "Food & Beverages",
       "eliminated": false,
@@ -172,7 +173,7 @@
     },
     {
       "id": "ca1",
-      "name": "Team CA-1",
+      "name": "Men in sales",
       "password": "Lp3nV7",
       "domain": "Clothing & Apparels",
       "eliminated": false,
@@ -214,92 +215,8 @@
     },
     {
       "id": "ca2",
-      "name": "Team CA-2",
+      "name": "3 brain cells",
       "password": "Sd8kM1",
-      "domain": "Clothing & Apparels",
-      "eliminated": false,
-      "scores": {
-        "round1": {
-          "insightAccuracy": 0,
-          "taglineCreativity": 0,
-          "audienceInsight": 0,
-          "bonusTokens": 0,
-          "judgeVotes": 0
-        },
-        "round2": {
-          "remainingTokens": 0,
-          "judgeVotes": 0
-        },
-        "round3": {
-          "creativity": 0,
-          "relevance": 0,
-          "performance": 0,
-          "clarity": 0,
-          "engagement": 0,
-          "judgeVotes": 0
-        },
-        "round4": {
-          "strategy": 0,
-          "creativity": 0,
-          "impact": 0,
-          "audienceVotes": 6
-        },
-        "round5": {
-          "insight": 0,
-          "strategy": 0,
-          "creativity": 0,
-          "feasibility": 0,
-          "delivery": 0,
-          "judgeVotes": 0
-        }
-      }
-    },
-    {
-      "id": "ca3",
-      "name": "Team CA-3",
-      "password": "Vf2rX9",
-      "domain": "Clothing & Apparels",
-      "eliminated": false,
-      "scores": {
-        "round1": {
-          "insightAccuracy": 0,
-          "taglineCreativity": 0,
-          "audienceInsight": 0,
-          "bonusTokens": 0,
-          "judgeVotes": 0
-        },
-        "round2": {
-          "remainingTokens": 0,
-          "judgeVotes": 0
-        },
-        "round3": {
-          "creativity": 0,
-          "relevance": 0,
-          "performance": 0,
-          "clarity": 0,
-          "engagement": 0,
-          "judgeVotes": 0
-        },
-        "round4": {
-          "strategy": 0,
-          "creativity": 0,
-          "impact": 0,
-          "audienceVotes": 0
-        },
-        "round5": {
-          "insight": 0,
-          "strategy": 0,
-          "creativity": 0,
-          "feasibility": 0,
-          "delivery": 0,
-          "judgeVotes": 0
-        }
-      }
-    },
-    {
-      "id": "ca4",
-      "name": "Team CA-4",
-      "password": "Tc6yW5",
       "domain": "Clothing & Apparels",
       "eliminated": false,
       "scores": {
@@ -340,7 +257,7 @@
     },
     {
       "id": "me1",
-      "name": "Team ME-1",
+      "name": "Paneer Biryani",
       "password": "Jn4bQ8",
       "domain": "Media & Entertainment",
       "eliminated": false,
@@ -382,7 +299,7 @@
     },
     {
       "id": "me2",
-      "name": "Team ME-2",
+      "name": "Impact 3",
       "password": "Xg7dH3",
       "domain": "Media & Entertainment",
       "eliminated": false,
@@ -424,7 +341,7 @@
     },
     {
       "id": "me3",
-      "name": "Team ME-3",
+      "name": "Team esctasy",
       "password": "Mw9zS6",
       "domain": "Media & Entertainment",
       "eliminated": false,
@@ -466,7 +383,7 @@
     },
     {
       "id": "me4",
-      "name": "Team ME-4",
+      "name": "fantastic3",
       "password": "Fr1cK4",
       "domain": "Media & Entertainment",
       "eliminated": false,
@@ -511,84 +428,63 @@
     {
       "id": "p1",
       "name": "Prime Member 1",
-      "password": "Prime@01"
+      "password": "Prm1#2026"
     },
     {
       "id": "p2",
       "name": "Prime Member 2",
-      "password": "Prime@02"
+      "password": "Prm2#2026"
     },
     {
       "id": "p3",
       "name": "Prime Member 3",
-      "password": "Prime@03"
+      "password": "Prm3#2026"
     },
     {
       "id": "p4",
       "name": "Prime Member 4",
-      "password": "Prime@04"
+      "password": "Prm4#2026"
     },
     {
       "id": "p5",
       "name": "Prime Member 5",
-      "password": "Prime@05"
+      "password": "Prm5#2026"
     }
   ],
   "judges": [
     {
       "id": "j1",
       "name": "Judge 1",
-      "password": "Judge@01"
+      "password": "Jdg1$Mayhem"
     },
     {
       "id": "j2",
       "name": "Judge 2",
-      "password": "Judge@02"
+      "password": "Jdg2$Mayhem"
     },
     {
       "id": "j3",
       "name": "Judge 3",
-      "password": "Judge@03"
+      "password": "Jdg3$Mayhem"
+    },
+    {
+      "id": "j4",
+      "name": "Judge 4",
+      "password": "Jdg4$Mayhem"
+    },
+    {
+      "id": "j5",
+      "name": "Judge 5",
+      "password": "Jdg5$Mayhem"
     }
   ],
   "timer": {
-    "endTime": null,
+    "endTime": 1775182857291,
     "running": false,
-    "label": ""
+    "label": "socket-check"
   },
-  "battles": [
-    {
-      "id": "battle_1774899862221",
-      "team1Id": "fb1",
-      "team2Id": "fb2",
-      "status": "completed"
-    },
-    {
-      "id": "battle_1774906313580",
-      "team1Id": "fb2",
-      "team2Id": "fb3",
-      "status": "completed"
-    },
-    {
-      "id": "battle_1774906432946",
-      "team1Id": "ca1",
-      "team2Id": "ca2",
-      "status": "completed"
-    }
-  ],
+  "battles": [],
   "activeBattleId": null,
   "warVotes": {},
-  "judgeVotes": {
-    "2": {
-      "fb2": {
-        "j2": 19
-      }
-    },
-    "5": {
-      "fb2": {
-        "j1": 0
-      }
-    }
-  },
-  "judgeVotingRound": null
+  "judgeVotes": {}
 }
